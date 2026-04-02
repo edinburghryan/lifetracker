@@ -605,6 +605,7 @@ const App = (() => {
       const isDark = isDarkMode();
       document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
       localStorage.setItem('lt_theme', isDark ? 'light' : 'dark');
+      render();
     });
 
     // Logout
