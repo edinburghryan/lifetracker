@@ -40,11 +40,12 @@ const App = (() => {
   }
 
   function getColourForGroup(colorHex) {
-    const palette = isDarkMode() ? DARK_PALETTE : PALETTE;
-    const match = PALETTE.find(p => p.header === colorHex);
-    if (!match) return { header: colorHex, tint: colorHex + '20' };
-    const idx = PALETTE.indexOf(match);
-    return palette[idx];
+    const activePalette = isDarkMode() ? DARK_PALETTE : PALETTE;
+    // Match against both palettes so colours saved in either mode resolve correctly
+    let idx = PALETTE.findIndex(p => p.header === colorHex);
+    if (idx === -1) idx = DARK_PALETTE.findIndex(p => p.header === colorHex);
+    if (idx === -1) return { header: colorHex, tint: colorHex + '20' };
+    return activePalette[idx];
   }
 
   function isWithinDays(dateVal, days) {
@@ -544,7 +545,8 @@ const App = (() => {
     grid.innerHTML = '';
     PALETTE.forEach(colour => {
       const swatch = document.createElement('button');
-      swatch.className = 'colour-swatch' + (group && group.color === colour.header ? ' selected' : '');
+      const isSelected = group && (group.color === colour.header || DARK_PALETTE[PALETTE.indexOf(colour)].header === group.color);
+      swatch.className = 'colour-swatch' + (isSelected ? ' selected' : '');
       swatch.style.background = colour.header;
       swatch.title = colour.name;
       swatch.addEventListener('click', () => {
