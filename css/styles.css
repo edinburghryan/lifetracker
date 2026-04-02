@@ -313,6 +313,7 @@ body {
   user-select: none;
   gap: 0.5rem;
   min-height: 44px;
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.1) 100%);
 }
 
 .group-header:active {
@@ -575,7 +576,7 @@ body {
   border: none;
   background: transparent;
   font: inherit;
-  font-size: 0.88rem;
+  font-size: 16px;
   color: var(--text);
   outline: none;
   padding: 6px 0;
@@ -755,12 +756,12 @@ body {
 
 .modal-field textarea {
   width: 100%;
-  min-height: 80px;
+  min-height: 160px;
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.5rem 0.75rem;
   font: inherit;
-  font-size: 0.88rem;
+  font-size: 16px;
   color: var(--text);
   background: var(--bg);
   resize: vertical;
@@ -782,13 +783,29 @@ body {
   border-radius: 8px;
   padding: 0.4rem 0.75rem;
   font: inherit;
-  font-size: 0.88rem;
+  font-size: 16px;
   color: var(--text);
   background: var(--bg);
   outline: none;
 }
 
 .modal-field input[type="date"]:focus {
+  border-color: var(--text-secondary);
+}
+
+.modal-field select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  font: inherit;
+  font-size: 0.88rem;
+  background: var(--bg);
+  color: var(--text-primary);
+  appearance: auto;
+}
+
+.modal-field select:focus {
   border-color: var(--text-secondary);
 }
 

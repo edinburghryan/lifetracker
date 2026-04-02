@@ -244,6 +244,9 @@ const App = (() => {
         ghostClass: 'sortable-ghost',
         dragClass: 'sortable-drag',
         handle: '.task-item',
+        delay: 300,
+        delayOnTouchOnly: true,
+        touchStartThreshold: 5,
         group: { name: 'tasks', pull: false, put: false },
         onEnd: () => {} // Top priority reorder is session-only per spec
       });
@@ -318,6 +321,9 @@ const App = (() => {
         animation: 150,
         ghostClass: 'sortable-ghost',
         dragClass: 'sortable-drag',
+        delay: 300,
+        delayOnTouchOnly: true,
+        touchStartThreshold: 5,
         group: 'tasks',
         onEnd: handleTaskDragEnd
       });
@@ -329,6 +335,9 @@ const App = (() => {
       animation: 150,
       ghostClass: 'sortable-ghost',
       dragClass: 'sortable-drag',
+      delay: 300,
+      delayOnTouchOnly: true,
+      touchStartThreshold: 5,
       handle: '.group-header',
       onEnd: handleGroupDragEnd
     });
@@ -454,6 +463,12 @@ const App = (() => {
     createdByEl.textContent = `Created by ${task.created_by || 'Unknown'}`;
     createdAtEl.textContent = task.created_at ? formatFullDate(task.created_at) : '';
 
+    // Populate "Move to" group selector
+    const moveGroupEl = document.getElementById('modal-move-group');
+    moveGroupEl.innerHTML = groups
+      .map(g => `<option value="${g.id}" ${g.id === task.group_id ? 'selected' : ''}>${escapeHtml(g.name)}</option>`)
+      .join('');
+
     overlay.classList.remove('hidden');
   }
 
@@ -482,6 +497,12 @@ const App = (() => {
 
     if (newDate !== currentDate) {
       updates.due_date = newDate ? firebase.firestore.Timestamp.fromDate(new Date(newDate + 'T00:00:00')) : null;
+    }
+
+    const newGroupId = document.getElementById('modal-move-group').value;
+    if (task && newGroupId && newGroupId !== task.group_id) {
+      updates.group_id = newGroupId;
+      updates.order_index = tasks.filter(t => t.group_id === newGroupId && !t.completed && !t.deleted).length;
     }
 
     if (Object.keys(updates).length > 0) {

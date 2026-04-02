@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>LifeTracker</title>
   <meta name="apple-mobile-web-app-title" content="LifeTracker">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -123,6 +123,10 @@
               <input type="date" id="modal-due-date">
               <button class="clear-date-btn" id="modal-clear-date" title="Clear date">&times;</button>
             </div>
+          </div>
+          <div class="modal-field">
+            <label>Move to</label>
+            <select id="modal-move-group"></select>
           </div>
           <div class="modal-meta">
             <span id="modal-created-by"></span>
