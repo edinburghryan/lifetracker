@@ -306,7 +306,7 @@ body {
   display: flex;
   align-items: center;
   padding: 0.6rem 0.75rem;
-  color: #fff;
+  color: #2C2C2E;
   font-weight: 600;
   font-size: 0.9rem;
   cursor: grab;
@@ -324,15 +324,18 @@ body {
   cursor: default;
 }
 
-[data-theme="dark"] .top-priority-header {
+[data-theme="dark"] .top-priority-header,
+[data-theme="dark"] .group-header {
   color: #1C1C1E;
 }
 
-[data-theme="dark"] .top-priority-header .collapse-btn {
+[data-theme="dark"] .top-priority-header .collapse-btn,
+[data-theme="dark"] .group-header .collapse-btn {
   color: rgba(0, 0, 0, 0.6);
 }
 
-[data-theme="dark"] .top-priority-header .group-count {
+[data-theme="dark"] .top-priority-header .group-count,
+[data-theme="dark"] .group-header .group-count {
   background: rgba(0, 0, 0, 0.15);
 }
 
@@ -374,7 +377,7 @@ body {
 .group-action-btn {
   background: none;
   border: none;
-  color: rgba(255,255,255,0.7);
+  color: rgba(44,44,46,0.6);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -384,14 +387,14 @@ body {
 }
 
 .group-action-btn:hover {
-  color: #fff;
-  background: rgba(255,255,255,0.15);
+  color: #2C2C2E;
+  background: rgba(0,0,0,0.1);
 }
 
 .collapse-btn {
   background: none;
   border: none;
-  color: rgba(255,255,255,0.8);
+  color: rgba(44,44,46,0.7);
   cursor: pointer;
   padding: 2px;
   display: flex;
