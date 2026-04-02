@@ -17,6 +17,7 @@ Inspired by Wunderlist. Focused on effortless capture, visual organisation via c
 | Auth        | Per-user PIN (RC and LC each have their own)           |
 | Drag & Drop | SortableJS (lightweight, no dependencies)              |
 | Dark Mode   | Toggle, persisted per-device in localStorage           |
+| iOS PWA     | apple-touch-icon + standalone web app meta tags         |
 
 ---
 
@@ -119,7 +120,7 @@ A separate view/section for soft-deleted tasks.
 **Behaviour:**
 - Deleted tasks are soft-deleted (`deleted = true`, `deleted_at = now`).
 - Visible in the Recycle Bin for 30 days.
-- Can be restored (un-deleted) within that window — returns to original group.
+- Can be restored (un-deleted) within that window — returns to original group, or to the first group if the original was deleted.
 - After 30 days, permanently removed (Firestore TTL or scheduled cleanup).
 
 ---
@@ -145,6 +146,7 @@ A separate view/section for soft-deleted tasks.
 - **Move tasks** between groups (updates `group_id`).
 - **Reorder groups** (cannot move above Top Priority).
 - **Reorder tasks** within Top Priority (overrides default sort).
+- **Touch devices:** Long-press (300ms) required to initiate drag, so normal scrolling is unimpeded.
 
 ### 4.5 Task Detail View
 - Click/tap a task to open a detail panel (slide-in or modal).
@@ -152,6 +154,7 @@ A separate view/section for soft-deleted tasks.
   - **Title** (inline)
   - **Description** (free text area)
   - **Due date** (date picker)
+  - **Move to** (group selector — moves task to a different group)
 - Shows created-by badge (RC/LC) and creation date.
 - Delete button (sends to Recycle Bin).
 
