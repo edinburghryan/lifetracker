@@ -283,7 +283,7 @@ const App = (() => {
         : group.is_collapsed;
 
       groupEl.innerHTML = `
-        <div class="group-header" style="background: linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(0,0,0,0.5) 100%), ${colours.header}">
+        <div class="group-header" style="background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(0,0,0,0.4) 100%), ${colours.header}">
           <button class="collapse-btn ${isCollapsed ? 'collapsed' : ''}" data-group="${group.id}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
