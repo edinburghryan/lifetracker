@@ -324,6 +324,18 @@ body {
   cursor: default;
 }
 
+[data-theme="dark"] .top-priority-header {
+  color: #1C1C1E;
+}
+
+[data-theme="dark"] .top-priority-header .collapse-btn {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .top-priority-header .group-count {
+  background: rgba(0, 0, 0, 0.15);
+}
+
 .completed-header {
   background: var(--completed-header);
   cursor: default;
