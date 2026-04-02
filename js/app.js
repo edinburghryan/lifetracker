@@ -636,6 +636,7 @@ const App = (() => {
         editingTaskId = null;
       }
     });
+    document.getElementById('modal-ok').addEventListener('click', closeTaskModal);
     document.getElementById('modal-clear-date').addEventListener('click', () => {
       document.getElementById('modal-due-date').value = '';
     });

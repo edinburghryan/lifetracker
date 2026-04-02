@@ -800,7 +800,30 @@ body {
 .modal-footer {
   padding: 0 1.25rem 1.25rem;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-delete-btn {
+  color: var(--text-secondary);
+  opacity: 0.5;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.modal-delete-btn:hover {
+  opacity: 1;
+  color: var(--danger);
+  background: none;
+}
+
+.btn-ok {
+  background: var(--border);
+  color: var(--text);
+}
+
+.btn-ok:hover {
+  background: var(--text-secondary);
+  color: var(--surface);
 }
 
 .btn {
