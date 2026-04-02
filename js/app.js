@@ -542,8 +542,12 @@ const App = (() => {
           <span class="deleted-date">${formatFullDate(task.deleted_at)}</span>
           <button class="restore-btn" data-task-id="${task.id}">Restore</button>
         `;
-        el.querySelector('.restore-btn').addEventListener('click', () => {
-          Store.restoreTask(task.id);
+        el.querySelector('.restore-btn').addEventListener('click', async () => {
+          const groupExists = groups.some(g => g.id === task.group_id);
+          if (!groupExists && groups.length > 0) {
+            await Store.updateTask(task.id, { group_id: groups[0].id });
+          }
+          await Store.restoreTask(task.id);
           openRecycleBin(); // Refresh
         });
         container.appendChild(el);
