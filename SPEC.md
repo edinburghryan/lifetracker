@@ -1,4 +1,4 @@
-# CrawfordCommon — Product Specification v1
+# LifeTracker — Product Specification v1
 
 ## 1. Product Overview
 
@@ -14,7 +14,7 @@ Inspired by Wunderlist. Focused on effortless capture, visual organisation via c
 | Frontend    | Static HTML / CSS / JS — no framework (v1)             |
 | Hosting     | GitHub Pages (`edinburghryan.github.io/lifetracker`) |
 | Database    | Firebase Firestore (Spark / free plan)                 |
-| Auth        | Shared PIN → identity selection (RC or LC)             |
+| Auth        | Per-user PIN (RC and LC each have their own)           |
 | Drag & Drop | SortableJS (lightweight, no dependencies)              |
 | Dark Mode   | Toggle, persisted per-device in localStorage           |
 
