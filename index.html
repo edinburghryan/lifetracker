@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="img/icon-v2-180.png">
   <link rel="apple-touch-icon" sizes="152x152" href="img/icon-v2-152.png">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="css/styles.css?v=20260402g">
+  <link rel="stylesheet" href="css/styles.css?v=20260405a">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -99,6 +99,9 @@
           </button>
           <span class="group-name">Completed</span>
           <span class="group-count" id="completed-count">0</span>
+          <button class="clear-completed-btn" id="clear-completed-btn" title="Delete all completed tasks">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
         </div>
         <div class="task-list" id="completed-tasks"></div>
       </section>
@@ -182,7 +185,7 @@
   <!-- App Scripts -->
   <script src="js/firebase-config.js?v=20260402a"></script>
   <script src="js/store.js?v=20260402a"></script>
-  <script src="js/app.js?v=20260402i"></script>
+  <script src="js/app.js?v=20260405a"></script>
 
 </body>
 </html>

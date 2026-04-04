@@ -321,7 +321,16 @@ body {
 
 .top-priority-header {
   background: var(--top-priority-header);
+  color: #F5F5F7;
   cursor: default;
+}
+
+.top-priority-header .collapse-btn {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.top-priority-header .group-count {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 [data-theme="dark"] .top-priority-header,
@@ -342,6 +351,31 @@ body {
 .completed-header {
   background: var(--completed-header);
   cursor: default;
+}
+
+.clear-completed-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.clear-completed-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="dark"] .clear-completed-btn {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .clear-completed-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .group-name {

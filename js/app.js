@@ -709,6 +709,16 @@ const App = (() => {
       }
     });
 
+    // Clear all completed tasks
+    document.getElementById('clear-completed-btn').addEventListener('click', async () => {
+      const completedTasks = tasks.filter(t => t.completed && !t.deleted);
+      if (completedTasks.length === 0) return;
+      if (!confirm(`Permanently delete ${completedTasks.length} completed task${completedTasks.length === 1 ? '' : 's'}?`)) return;
+      for (const task of completedTasks) {
+        await Store.permanentlyDeleteTask(task.id);
+      }
+    });
+
     // Group actions (delegated)
     document.addEventListener('click', (e) => {
       const actionBtn = e.target.closest('.group-action-btn');
