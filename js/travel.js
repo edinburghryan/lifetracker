@@ -315,5 +315,9 @@ const Travel = (() => {
     });
   }
 
-  return { init };
+  function refreshTheme() {
+    render();
+  }
+
+  return { init, refreshTheme };
 })();

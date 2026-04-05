@@ -593,6 +593,7 @@ const App = (() => {
       document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
       localStorage.setItem('lt_theme', isDark ? 'light' : 'dark');
       render();
+      if (typeof Travel !== 'undefined' && Travel.refreshTheme) Travel.refreshTheme();
       if (typeof Weight !== 'undefined' && Weight.refreshTheme) Weight.refreshTheme();
     });
 
