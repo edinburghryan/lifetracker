@@ -84,11 +84,17 @@ const Weight = (() => {
     return best;
   }
 
-  function movingAverage(windowSize) {
-    if (entries.length === 0) return null;
-    const slice = entries.slice(-windowSize);
-    const sum = slice.reduce((acc, e) => acc + e.weight, 0);
-    return sum / slice.length;
+  function movingAvgLoss(windowSize) {
+    if (entries.length < 2) return null;
+    const recent = entries.slice(-(windowSize + 1));
+    if (recent.length < 2) return null;
+    let totalDrop = 0;
+    let count = 0;
+    for (let i = 1; i < recent.length; i++) {
+      totalDrop += recent[i - 1].weight - recent[i].weight;
+      count++;
+    }
+    return totalDrop / count;
   }
 
   function entryDate(entry) {
@@ -183,18 +189,10 @@ const Weight = (() => {
     const lost = totalLost();
     const avgLoss = avgWeeklyLoss();
     const best = bestWeek();
-    const ma4 = movingAverage(4);
+    const ma4 = movingAvgLoss(4);
 
     const html = `
       <div class="weight-stats-grid">
-        <div class="weight-stat-card">
-          <div class="weight-stat-value">${starting ? starting.weight.toFixed(1) : '—'}</div>
-          <div class="weight-stat-label">Starting (BMI ${starting ? bmi(starting.weight) : '—'})</div>
-        </div>
-        <div class="weight-stat-card">
-          <div class="weight-stat-value">${current ? current.weight.toFixed(1) : '—'}</div>
-          <div class="weight-stat-label">Current (BMI ${current ? bmi(current.weight) : '—'})</div>
-        </div>
         <div class="weight-stat-card">
           <div class="weight-stat-value">${lost.toFixed(1)} kg</div>
           <div class="weight-stat-label">Total Lost</div>
@@ -204,12 +202,20 @@ const Weight = (() => {
           <div class="weight-stat-label">Avg / Week</div>
         </div>
         <div class="weight-stat-card">
+          <div class="weight-stat-value">${starting ? bmi(starting.weight) : '—'}</div>
+          <div class="weight-stat-label">Starting BMI</div>
+        </div>
+        <div class="weight-stat-card">
+          <div class="weight-stat-value">${ma4 ? ma4.toFixed(1) : '—'} kg</div>
+          <div class="weight-stat-label">4-wk Avg Loss</div>
+        </div>
+        <div class="weight-stat-card">
           <div class="weight-stat-value">${best.toFixed(1)} kg</div>
           <div class="weight-stat-label">Best (last 4 wks)</div>
         </div>
         <div class="weight-stat-card">
-          <div class="weight-stat-value">${ma4 ? ma4.toFixed(1) : '—'}</div>
-          <div class="weight-stat-label">4-wk Average</div>
+          <div class="weight-stat-value">${current ? bmi(current.weight) : '—'}</div>
+          <div class="weight-stat-label">Current BMI</div>
         </div>
       </div>
     `;
