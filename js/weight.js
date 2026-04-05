@@ -211,7 +211,7 @@ const Weight = (() => {
         </div>
         <div class="weight-stat-card">
           <div class="weight-stat-value">${best.toFixed(1)} kg</div>
-          <div class="weight-stat-label">Best (last 4 wks)</div>
+          <div class="weight-stat-label">4-wk Best</div>
         </div>
         <div class="weight-stat-card">
           <div class="weight-stat-value">${current ? bmi(current.weight) : '—'}</div>
