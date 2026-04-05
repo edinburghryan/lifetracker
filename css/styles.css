@@ -1265,14 +1265,12 @@ body {
   color: var(--text-secondary);
 }
 
-/* Travel and weight section group headers — not draggable */
-.page-travel .group-header,
-.weight-section .group-header {
+/* Travel group headers — not draggable */
+.page-travel .group-header {
   cursor: default;
 }
 
-.page-travel .group-header:active,
-.weight-section .group-header:active {
+.page-travel .group-header:active {
   cursor: default;
 }
 

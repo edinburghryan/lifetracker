@@ -11,6 +11,21 @@ const Weight = (() => {
   let chartInstance = null;
   let editingEntryId = null;
   let collapseState = {};
+  let sortableInstance = null;
+
+  const DEFAULT_SECTION_ORDER = ['stats', 'milestones', 'log', 'chart', 'history'];
+
+  function getSectionOrder() {
+    try {
+      const saved = localStorage.getItem('lt_weight_section_order');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return DEFAULT_SECTION_ORDER;
+  }
+
+  function saveSectionOrder(order) {
+    localStorage.setItem('lt_weight_section_order', JSON.stringify(order));
+  }
 
   const escapeHtml = Utils.escapeHtml;
   const isDarkMode = Utils.isDarkMode;
@@ -103,11 +118,35 @@ const Weight = (() => {
     const page = document.getElementById('page-weight');
     page.innerHTML = '';
 
-    renderStats(page);
-    renderMilestones(page);
-    renderLogForm(page);
-    renderChart(page);
-    renderHistory(page);
+    const renderers = {
+      stats: renderStats,
+      milestones: renderMilestones,
+      log: renderLogForm,
+      chart: renderChart,
+      history: renderHistory
+    };
+
+    const order = getSectionOrder();
+    order.forEach(id => {
+      if (renderers[id]) renderers[id](page);
+    });
+
+    // Init sortable for section reordering
+    if (sortableInstance) sortableInstance.destroy();
+    sortableInstance = new Sortable(page, {
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      dragClass: 'sortable-drag',
+      handle: '.group-header',
+      delay: 300,
+      delayOnTouchOnly: true,
+      touchStartThreshold: 5,
+      onEnd: () => {
+        const sections = page.querySelectorAll('.weight-section');
+        const newOrder = Array.from(sections).map(s => s.dataset.sectionId);
+        saveSectionOrder(newOrder);
+      }
+    });
   }
 
   function createSection(id, title, colour, content) {

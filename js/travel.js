@@ -144,7 +144,6 @@ const Travel = (() => {
     el.innerHTML = `
       <button class="task-checkbox ${task.completed ? 'checked' : ''}" data-task-id="${task.id}" title="${task.completed ? 'Uncheck' : 'Check off'}"></button>
       <span class="task-title ${task.completed ? 'completed-text' : ''}">${escapeHtml(task.title)}</span>
-      <span class="task-creator">${task.created_by || ''}</span>
     `;
 
     el.querySelector('.task-checkbox').addEventListener('click', (e) => {
