@@ -193,21 +193,21 @@ const Weight = (() => {
 
     const html = `
       <div class="weight-stats-grid">
-        <div class="weight-stat-card">
+        <div class="weight-stat-card weight-stat-highlight">
           <div class="weight-stat-value">${lost.toFixed(1)} kg</div>
           <div class="weight-stat-label">Total Lost</div>
         </div>
         <div class="weight-stat-card">
-          <div class="weight-stat-value">${avgLoss.toFixed(1)} kg</div>
-          <div class="weight-stat-label">Avg / Week</div>
+          <div class="weight-stat-value">${ma4 ? ma4.toFixed(1) : '—'} kg</div>
+          <div class="weight-stat-label">4-wk Avg Loss</div>
         </div>
         <div class="weight-stat-card">
           <div class="weight-stat-value">${starting ? bmi(starting.weight) : '—'}</div>
           <div class="weight-stat-label">Starting BMI</div>
         </div>
         <div class="weight-stat-card">
-          <div class="weight-stat-value">${ma4 ? ma4.toFixed(1) : '—'} kg</div>
-          <div class="weight-stat-label">4-wk Avg Loss</div>
+          <div class="weight-stat-value">${avgLoss.toFixed(1)} kg</div>
+          <div class="weight-stat-label">Avg / Week</div>
         </div>
         <div class="weight-stat-card">
           <div class="weight-stat-value">${best.toFixed(1)} kg</div>
