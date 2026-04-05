@@ -188,6 +188,82 @@ const Store = (() => {
     return travelGroupsRef.doc(id).update(data);
   }
 
+  async function seedTravelTasks() {
+    const snapshot = await travelTasksRef.get();
+    if (!snapshot.empty) return;
+
+    // Look up group IDs by name
+    const groupsSnap = await travelGroupsRef.orderBy('order_index').get();
+    const groups = {};
+    groupsSnap.forEach(doc => { groups[doc.data().name] = doc.id; });
+
+    const preparing = groups['Preparing to Leave'];
+    const lys = groups["Ly's Stuff"];
+    const ryans = groups["Ryan's Stuff"];
+    if (!preparing || !lys || !ryans) return;
+
+    const now = firebase.firestore.FieldValue.serverTimestamp();
+    const tasks = [
+      // Preparing to Leave — Both
+      { title: 'Empty bins', group_id: preparing, applies_to: 'both', order_index: 0 },
+      { title: 'Empty fridge', group_id: preparing, applies_to: 'both', order_index: 1 },
+      { title: 'Switch HIVE to ON & set 13°C', group_id: preparing, applies_to: 'both', order_index: 2 },
+      { title: 'Empty dish washer', group_id: preparing, applies_to: 'both', order_index: 3 },
+      { title: 'Empty washing machine', group_id: preparing, applies_to: 'both', order_index: 4 },
+      { title: 'Take clothes off radiators', group_id: preparing, applies_to: 'both', order_index: 5 },
+      { title: 'Water plants', group_id: preparing, applies_to: 'both', order_index: 6 },
+      // Preparing to Leave — Moniaive only
+      { title: 'Check external doors are locked', group_id: preparing, applies_to: 'moniaive', order_index: 7 },
+      { title: 'Check garage doors are locked', group_id: preparing, applies_to: 'moniaive', order_index: 8 },
+      { title: 'Check electric heaters are on low', group_id: preparing, applies_to: 'moniaive', order_index: 9 },
+      { title: 'Turn off water pump', group_id: preparing, applies_to: 'moniaive', order_index: 10 },
+      { title: 'Turn off printer', group_id: preparing, applies_to: 'moniaive', order_index: 11 },
+      { title: 'Set RING to away', group_id: preparing, applies_to: 'moniaive', order_index: 12 },
+      { title: 'Enable automation on HUE Lights', group_id: preparing, applies_to: 'moniaive', order_index: 13 },
+      { title: 'Feed birds', group_id: preparing, applies_to: 'moniaive', order_index: 14 },
+      // Preparing to Leave — Edinburgh only
+      { title: 'Turn off underfloor heating', group_id: preparing, applies_to: 'edinburgh', order_index: 15 },
+      // Ly's Stuff — all Both
+      { title: 'Wallet', group_id: lys, applies_to: 'both', order_index: 0 },
+      { title: 'Glasses', group_id: lys, applies_to: 'both', order_index: 1 },
+      { title: 'Treat bag', group_id: lys, applies_to: 'both', order_index: 2 },
+      { title: 'Canicross kit', group_id: lys, applies_to: 'both', order_index: 3 },
+      { title: 'Leads', group_id: lys, applies_to: 'both', order_index: 4 },
+      { title: 'Running gloves and headbands', group_id: lys, applies_to: 'both', order_index: 5 },
+      { title: 'Running shoes', group_id: lys, applies_to: 'both', order_index: 6 },
+      { title: 'Water bottle', group_id: lys, applies_to: 'both', order_index: 7 },
+      { title: 'Running vest', group_id: lys, applies_to: 'both', order_index: 8 },
+      { title: 'Running food', group_id: lys, applies_to: 'both', order_index: 9 },
+      { title: 'Bose headphones', group_id: lys, applies_to: 'both', order_index: 10 },
+      // Ryan's Stuff — all Both
+      { title: 'Mounjaro Pen', group_id: ryans, applies_to: 'both', order_index: 0 },
+      { title: 'Wallet', group_id: ryans, applies_to: 'both', order_index: 1 },
+      { title: 'Glasses', group_id: ryans, applies_to: 'both', order_index: 2 },
+      { title: 'Rain Jacket', group_id: ryans, applies_to: 'both', order_index: 3 },
+      { title: 'Laptop', group_id: ryans, applies_to: 'both', order_index: 4 },
+      { title: 'Charging pouch', group_id: ryans, applies_to: 'both', order_index: 5 },
+      { title: 'Wired & Wireless Earbuds', group_id: ryans, applies_to: 'both', order_index: 6 },
+      { title: 'NAS', group_id: ryans, applies_to: 'both', order_index: 7 },
+      { title: 'Switch 2', group_id: ryans, applies_to: 'both', order_index: 8 },
+      { title: 'Painkillers', group_id: ryans, applies_to: 'both', order_index: 9 },
+    ];
+
+    // Firestore batch limit is 500, we're well under
+    const batch = db.batch();
+    tasks.forEach(t => {
+      const ref = travelTasksRef.doc();
+      batch.set(ref, {
+        ...t,
+        description: '',
+        created_by: 'RC',
+        created_at: now,
+        completed: false,
+        completed_at: null
+      });
+    });
+    return batch.commit();
+  }
+
   /* ---------- Travel Tasks ---------- */
 
   function onTravelTasksChanged(callback) {
@@ -348,6 +424,7 @@ const Store = (() => {
     // Travel
     onTravelGroupsChanged,
     seedTravelGroups,
+    seedTravelTasks,
     updateTravelGroup,
     onTravelTasksChanged,
     createTravelTask,

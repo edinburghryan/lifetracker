@@ -23,8 +23,9 @@ const Travel = (() => {
     // Restore saved direction
     currentDirection = localStorage.getItem('lt_travel_direction') || 'moniaive';
 
-    // Seed travel groups if needed
+    // Seed travel groups and tasks if needed
     await Store.seedTravelGroups();
+    await Store.seedTravelTasks();
 
     // Real-time listeners
     Store.onTravelGroupsChanged(groups => {
