@@ -286,7 +286,7 @@ const Travel = (() => {
     // Task add input (delegated)
     document.getElementById('page-travel').addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return;
-      const input = e.target.closest('.task-add-input travel-task-add-input');
+      const input = e.target.closest('.travel-task-add-input');
       if (!input) return;
 
       const title = input.value.trim();
