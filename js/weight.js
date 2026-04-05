@@ -61,8 +61,9 @@ const Weight = (() => {
 
   function bestWeek() {
     let best = 0;
-    for (let i = 1; i < entries.length; i++) {
-      const diff = entries[i - 1].weight - entries[i].weight;
+    const recent = entries.slice(-4);
+    for (let i = 1; i < recent.length; i++) {
+      const diff = recent[i - 1].weight - recent[i].weight;
       if (diff > best) best = diff;
     }
     return best;
@@ -165,7 +166,7 @@ const Weight = (() => {
         </div>
         <div class="weight-stat-card">
           <div class="weight-stat-value">${best.toFixed(1)} kg</div>
-          <div class="weight-stat-label">Best Week</div>
+          <div class="weight-stat-label">Best (last 4 wks)</div>
         </div>
         <div class="weight-stat-card">
           <div class="weight-stat-value">${ma4 ? ma4.toFixed(1) : '—'}</div>

@@ -963,20 +963,6 @@ body {
   display: block;
 }
 
-.page-travel {
-  background: var(--travel-bg);
-  border-radius: 12px;
-  padding: 0.5rem;
-  margin: -0.5rem;
-}
-
-.page-weight {
-  background: var(--weight-bg);
-  border-radius: 12px;
-  padding: 0.5rem;
-  margin: -0.5rem;
-}
-
 .tab-bar {
   position: fixed;
   bottom: 0;
@@ -1279,8 +1265,14 @@ body {
   color: var(--text-secondary);
 }
 
-/* Weight section group headers */
+/* Travel and weight section group headers — not draggable */
+.page-travel .group-header,
 .weight-section .group-header {
+  cursor: default;
+}
+
+.page-travel .group-header:active,
+.weight-section .group-header:active {
   cursor: default;
 }
 
