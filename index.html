@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="img/icon-v2-180.png">
   <link rel="apple-touch-icon" sizes="152x152" href="img/icon-v2-152.png">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="css/styles.css?v=20260405a">
+  <link rel="stylesheet" href="css/styles.css?v=20260405b">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -71,42 +71,80 @@
     <!-- Main Content -->
     <main class="app-main" id="app-main">
 
-      <!-- Top Priority System Group -->
-      <section class="group top-priority-group" id="top-priority-group">
-        <div class="group-header top-priority-header">
-          <button class="collapse-btn" data-group="top-priority">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <span class="group-name">Top Priority</span>
-          <span class="group-count" id="top-priority-count">0</span>
+      <!-- ========== TASKS PAGE ========== -->
+      <div id="page-tasks" class="page page-tasks active">
+
+        <!-- Top Priority System Group -->
+        <section class="group top-priority-group" id="top-priority-group">
+          <div class="group-header top-priority-header">
+            <button class="collapse-btn" data-group="top-priority">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <span class="group-name">Top Priority</span>
+            <span class="group-count" id="top-priority-count">0</span>
+          </div>
+          <div class="task-list" id="top-priority-tasks"></div>
+        </section>
+
+        <!-- User Groups Container (sortable) -->
+        <div id="groups-container"></div>
+
+        <!-- Add Group Button -->
+        <div class="add-group-section">
+          <button class="add-group-btn" id="add-group-btn">+ Add Group</button>
         </div>
-        <div class="task-list" id="top-priority-tasks"></div>
-      </section>
 
-      <!-- User Groups Container (sortable) -->
-      <div id="groups-container"></div>
+        <!-- Completed Section -->
+        <section class="group completed-group" id="completed-group">
+          <div class="group-header completed-header">
+            <button class="collapse-btn" data-group="completed">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <span class="group-name">Completed</span>
+            <span class="group-count" id="completed-count">0</span>
+            <button class="clear-completed-btn" id="clear-completed-btn" title="Delete all completed tasks">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+          </div>
+          <div class="task-list" id="completed-tasks"></div>
+        </section>
 
-      <!-- Add Group Button -->
-      <div class="add-group-section">
-        <button class="add-group-btn" id="add-group-btn">+ Add Group</button>
       </div>
 
-      <!-- Completed Section -->
-      <section class="group completed-group" id="completed-group">
-        <div class="group-header completed-header">
-          <button class="collapse-btn" data-group="completed">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <span class="group-name">Completed</span>
-          <span class="group-count" id="completed-count">0</span>
-          <button class="clear-completed-btn" id="clear-completed-btn" title="Delete all completed tasks">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          </button>
+      <!-- ========== TRAVEL PAGE ========== -->
+      <div id="page-travel" class="page page-travel">
+        <!-- Direction Selector -->
+        <div class="direction-selector" id="direction-selector">
+          <button class="direction-btn active" data-direction="moniaive">Leaving Moniaive</button>
+          <button class="direction-btn" data-direction="edinburgh">Leaving Edinburgh</button>
         </div>
-        <div class="task-list" id="completed-tasks"></div>
-      </section>
+
+        <!-- Travel Groups (rendered by JS) -->
+        <div id="travel-groups-container"></div>
+      </div>
+
+      <!-- ========== WEIGHT PAGE ========== -->
+      <div id="page-weight" class="page page-weight">
+        <!-- Rendered by weight.js -->
+      </div>
 
     </main>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar" id="tab-bar">
+      <button class="tab-btn active" data-page="tasks">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Tasks</span>
+      </button>
+      <button class="tab-btn" data-page="travel">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Travel</span>
+      </button>
+      <button class="tab-btn" data-page="weight">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12l3 7H3z"/><path d="M3 9a9 9 0 0 0 18 0"/><line x1="12" y1="2" x2="12" y2="5"/></svg>
+        <span>Weight</span>
+      </button>
+    </nav>
 
     <!-- Task Detail Modal -->
     <div class="modal-overlay hidden" id="task-modal-overlay">
@@ -173,6 +211,70 @@
       </div>
     </div>
 
+    <!-- Travel Task Detail Modal -->
+    <div class="modal-overlay hidden" id="travel-modal-overlay">
+      <div class="modal" id="travel-modal">
+        <div class="modal-header">
+          <h2 class="modal-title" id="travel-modal-title" contenteditable="true"></h2>
+          <button class="icon-btn modal-close" id="travel-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-field">
+            <label>Description</label>
+            <textarea id="travel-modal-description" placeholder="Add notes..."></textarea>
+          </div>
+          <div class="modal-field">
+            <label>Applies to</label>
+            <select id="travel-modal-applies-to">
+              <option value="both">Both</option>
+              <option value="moniaive">Moniaive only</option>
+              <option value="edinburgh">Edinburgh only</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <label>Move to</label>
+            <select id="travel-modal-move-group"></select>
+          </div>
+          <div class="modal-meta">
+            <span id="travel-modal-created-by"></span>
+            <span id="travel-modal-created-at"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="icon-btn modal-delete-btn" id="travel-modal-delete" title="Delete task">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+          <button class="btn btn-ok" id="travel-modal-ok">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weight Edit Modal -->
+    <div class="modal-overlay hidden" id="weight-edit-modal-overlay">
+      <div class="modal modal-sm" id="weight-edit-modal">
+        <div class="modal-header">
+          <h2 class="modal-title">Edit Entry</h2>
+          <button class="icon-btn modal-close" id="weight-edit-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-field">
+            <label>Weight (kg)</label>
+            <input type="number" id="weight-edit-input" step="0.1" min="50" max="300" inputmode="decimal">
+          </div>
+          <div class="modal-field">
+            <label>Date</label>
+            <input type="date" id="weight-edit-date">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="icon-btn modal-delete-btn" id="weight-edit-delete" title="Delete entry">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+          <button class="btn btn-ok" id="weight-edit-ok">OK</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Firebase SDK (compat for simplicity with no build step) -->
@@ -182,10 +284,16 @@
   <!-- SortableJS -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
 
+  <!-- Chart.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
   <!-- App Scripts -->
   <script src="js/firebase-config.js?v=20260402a"></script>
-  <script src="js/store.js?v=20260402a"></script>
-  <script src="js/app.js?v=20260405a"></script>
+  <script src="js/store.js?v=20260405b"></script>
+  <script src="js/utils.js?v=20260405b"></script>
+  <script src="js/app.js?v=20260405b"></script>
+  <script src="js/travel.js?v=20260405b"></script>
+  <script src="js/weight.js?v=20260405b"></script>
 
 </body>
 </html>

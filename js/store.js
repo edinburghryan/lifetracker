@@ -6,6 +6,9 @@ const Store = (() => {
   const groupsRef = db.collection('groups');
   const tasksRef  = db.collection('tasks');
   const configRef = db.collection('config');
+  const travelGroupsRef = db.collection('travel_groups');
+  const travelTasksRef  = db.collection('travel_tasks');
+  const weightEntriesRef = db.collection('weight_entries');
 
   /* ---------- PIN Auth ---------- */
 
@@ -27,7 +30,7 @@ const Store = (() => {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  /* ---------- Groups ---------- */
+  /* ---------- Groups (Tasks page) ---------- */
 
   function onGroupsChanged(callback) {
     return groupsRef.orderBy('order_index').onSnapshot(snapshot => {
@@ -54,14 +57,12 @@ const Store = (() => {
   }
 
   async function deleteGroup(id) {
-    // Soft-delete all tasks in this group
     const tasks = await tasksRef.where('group_id', '==', id).get();
     const batch = db.batch();
     const now = firebase.firestore.Timestamp.now();
     tasks.forEach(doc => {
       batch.update(doc.ref, { deleted: true, deleted_at: now });
     });
-    // Delete the group document
     batch.delete(groupsRef.doc(id));
     return batch.commit();
   }
@@ -149,6 +150,172 @@ const Store = (() => {
     return batch.commit();
   }
 
+  /* ---------- Travel Groups ---------- */
+
+  function onTravelGroupsChanged(callback) {
+    return travelGroupsRef.orderBy('order_index').onSnapshot(snapshot => {
+      const groups = [];
+      snapshot.forEach(doc => {
+        groups.push({ id: doc.id, ...doc.data() });
+      });
+      callback(groups);
+    });
+  }
+
+  async function seedTravelGroups() {
+    const snapshot = await travelGroupsRef.get();
+    if (!snapshot.empty) return;
+
+    const defaults = [
+      { name: 'Preparing to Leave', color: '#A0B8C8', order_index: 0 },
+      { name: "Ly's Stuff",         color: '#E8A0C4', order_index: 1 },
+      { name: "Ryan's Stuff",       color: '#A0C4E8', order_index: 2 },
+    ];
+
+    const batch = db.batch();
+    defaults.forEach(g => {
+      const ref = travelGroupsRef.doc();
+      batch.set(ref, {
+        ...g,
+        is_collapsed: false,
+        created_at: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    return batch.commit();
+  }
+
+  async function updateTravelGroup(id, data) {
+    return travelGroupsRef.doc(id).update(data);
+  }
+
+  /* ---------- Travel Tasks ---------- */
+
+  function onTravelTasksChanged(callback) {
+    return travelTasksRef.onSnapshot(snapshot => {
+      const tasks = [];
+      snapshot.forEach(doc => {
+        tasks.push({ id: doc.id, ...doc.data() });
+      });
+      callback(tasks);
+    });
+  }
+
+  async function createTravelTask(title, groupId, orderIndex, createdBy, appliesTo) {
+    return travelTasksRef.add({
+      title,
+      description: '',
+      applies_to: appliesTo || 'both',
+      group_id: groupId,
+      order_index: orderIndex,
+      created_by: createdBy,
+      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+      completed: false,
+      completed_at: null
+    });
+  }
+
+  async function updateTravelTask(id, data) {
+    return travelTasksRef.doc(id).update(data);
+  }
+
+  async function completeTravelTask(id) {
+    return travelTasksRef.doc(id).update({
+      completed: true,
+      completed_at: firebase.firestore.Timestamp.now()
+    });
+  }
+
+  async function uncompleteTravelTask(id) {
+    return travelTasksRef.doc(id).update({
+      completed: false,
+      completed_at: null
+    });
+  }
+
+  async function deleteTravelTask(id) {
+    return travelTasksRef.doc(id).delete();
+  }
+
+  async function reorderTravelTasks(taskIdOrderPairs) {
+    const batch = db.batch();
+    taskIdOrderPairs.forEach(({ id, order_index, group_id }) => {
+      const update = { order_index };
+      if (group_id !== undefined) update.group_id = group_id;
+      batch.update(travelTasksRef.doc(id), update);
+    });
+    return batch.commit();
+  }
+
+  async function uncheckAllTravelTasks(taskIds) {
+    const batch = db.batch();
+    taskIds.forEach(id => {
+      batch.update(travelTasksRef.doc(id), {
+        completed: false,
+        completed_at: null
+      });
+    });
+    return batch.commit();
+  }
+
+  /* ---------- Weight Entries ---------- */
+
+  function onWeightEntriesChanged(callback) {
+    return weightEntriesRef.orderBy('date', 'asc').onSnapshot(snapshot => {
+      const entries = [];
+      snapshot.forEach(doc => {
+        entries.push({ id: doc.id, ...doc.data() });
+      });
+      callback(entries);
+    });
+  }
+
+  async function seedWeightEntries() {
+    const snapshot = await weightEntriesRef.get();
+    if (!snapshot.empty) return;
+
+    const seedData = [
+      { date: '2026-02-08', weight: 172.8 },
+      { date: '2026-02-14', weight: 170.3 },
+      { date: '2026-02-20', weight: 170.3 },
+      { date: '2026-02-27', weight: 168.2 },
+      { date: '2026-03-07', weight: 166.8 },
+      { date: '2026-03-14', weight: 165.6 },
+      { date: '2026-03-21', weight: 164.7 },
+      { date: '2026-03-28', weight: 163.9 },
+      { date: '2026-04-04', weight: 162.0 },
+    ];
+
+    const batch = db.batch();
+    seedData.forEach(entry => {
+      const ref = weightEntriesRef.doc();
+      batch.set(ref, {
+        date: firebase.firestore.Timestamp.fromDate(new Date(entry.date + 'T00:00:00')),
+        weight: entry.weight,
+        created_at: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    return batch.commit();
+  }
+
+  async function createWeightEntry(date, weight) {
+    return weightEntriesRef.add({
+      date: firebase.firestore.Timestamp.fromDate(new Date(date + 'T00:00:00')),
+      weight,
+      created_at: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  async function updateWeightEntry(id, data) {
+    if (data.date && typeof data.date === 'string') {
+      data.date = firebase.firestore.Timestamp.fromDate(new Date(data.date + 'T00:00:00'));
+    }
+    return weightEntriesRef.doc(id).update(data);
+  }
+
+  async function deleteWeightEntry(id) {
+    return weightEntriesRef.doc(id).delete();
+  }
+
   /* ---------- Setup helper ---------- */
 
   async function setupPins(rcPin, lcPin) {
@@ -178,6 +345,25 @@ const Store = (() => {
     restoreTask,
     permanentlyDeleteTask,
     reorderTasks,
+    // Travel
+    onTravelGroupsChanged,
+    seedTravelGroups,
+    updateTravelGroup,
+    onTravelTasksChanged,
+    createTravelTask,
+    updateTravelTask,
+    completeTravelTask,
+    uncompleteTravelTask,
+    deleteTravelTask,
+    reorderTravelTasks,
+    uncheckAllTravelTasks,
+    // Weight
+    onWeightEntriesChanged,
+    seedWeightEntries,
+    createWeightEntry,
+    updateWeightEntry,
+    deleteWeightEntry,
+    // Setup
     setupPins
   };
 })();

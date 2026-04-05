@@ -10,43 +10,16 @@ const App = (() => {
   let sortableInstances = {};
   let editingTaskId = null;
 
-  /* ---------- Pastel Palette ---------- */
-  const PALETTE = [
-    { name: 'Rose',     header: '#E8A0A0', tint: '#FDF0F0' },
-    { name: 'Peach',    header: '#E8C4A0', tint: '#FDF5F0' },
-    { name: 'Sand',     header: '#E8D8A0', tint: '#FDFAF0' },
-    { name: 'Sage',     header: '#A0D8A0', tint: '#F0FDF0' },
-    { name: 'Sky',      header: '#A0C4E8', tint: '#F0F5FD' },
-    { name: 'Lavender', header: '#C4A0E8', tint: '#F5F0FD' },
-    { name: 'Slate',    header: '#A0B8C8', tint: '#F0F4F8' },
-    { name: 'Blush',    header: '#E8A0C4', tint: '#FDF0F5' },
-  ];
+  /* ---------- Shorthand refs to Utils ---------- */
+  const PALETTE = Utils.PALETTE;
+  const DARK_PALETTE = Utils.DARK_PALETTE;
+  const isDarkMode = Utils.isDarkMode;
+  const getColourForGroup = Utils.getColourForGroup;
+  const escapeHtml = Utils.escapeHtml;
+  const formatFullDate = Utils.formatFullDate;
+  const formatDate = Utils.formatDate;
 
-  const DARK_PALETTE = [
-    { name: 'Rose',     header: '#8B5E5E', tint: '#3A2A2A' },
-    { name: 'Peach',    header: '#8B7A5E', tint: '#3A3228' },
-    { name: 'Sand',     header: '#8B845E', tint: '#3A3828' },
-    { name: 'Sage',     header: '#5E8B5E', tint: '#283A28' },
-    { name: 'Sky',      header: '#5E7A8B', tint: '#28323A' },
-    { name: 'Lavender', header: '#7A5E8B', tint: '#32283A' },
-    { name: 'Slate',    header: '#5E7080', tint: '#282E34' },
-    { name: 'Blush',    header: '#8B5E7A', tint: '#3A2832' },
-  ];
-
-  /* ---------- Helpers ---------- */
-
-  function isDarkMode() {
-    return document.documentElement.getAttribute('data-theme') === 'dark';
-  }
-
-  function getColourForGroup(colorHex) {
-    const activePalette = isDarkMode() ? DARK_PALETTE : PALETTE;
-    // Match against both palettes so colours saved in either mode resolve correctly
-    let idx = PALETTE.findIndex(p => p.header === colorHex);
-    if (idx === -1) idx = DARK_PALETTE.findIndex(p => p.header === colorHex);
-    if (idx === -1) return { header: colorHex, tint: colorHex + '20' };
-    return activePalette[idx];
-  }
+  /* ---------- Task-specific Helpers ---------- */
 
   function isWithinDays(dateVal, days) {
     if (!dateVal) return false;
@@ -71,29 +44,6 @@ const App = (() => {
     return d < now;
   }
 
-  function formatDate(dateVal) {
-    if (!dateVal) return '';
-    let d;
-    if (dateVal.toDate) d = dateVal.toDate();
-    else d = new Date(dateVal);
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    d.setHours(0, 0, 0, 0);
-    const diff = Math.round((d - now) / (1000 * 60 * 60 * 24));
-    if (diff === 0) return 'Today';
-    if (diff === 1) return 'Tomorrow';
-    if (diff === -1) return 'Yesterday';
-    if (diff < -1) return `${Math.abs(diff)}d overdue`;
-    if (diff <= 7) return `${diff}d`;
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  }
-
-  function formatFullDate(timestamp) {
-    if (!timestamp) return '';
-    const d = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  }
-
   function isTopPriority(task) {
     if (task.completed || task.deleted) return false;
     if (task.is_starred) return true;
@@ -107,6 +57,22 @@ const App = (() => {
       return `<svg viewBox="0 0 24 24"><polygon class="star-active" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
     }
     return `<svg viewBox="0 0 24 24"><polygon class="star-inactive" points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+  }
+
+  /* ---------- Page Switching ---------- */
+
+  function switchPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    const page = document.getElementById('page-' + pageId);
+    const tab = document.querySelector(`.tab-btn[data-page="${pageId}"]`);
+    if (page) page.classList.add('active');
+    if (tab) tab.classList.add('active');
+    localStorage.setItem('lt_active_page', pageId);
+
+    // Recycle bin button only on Tasks page
+    const recycleBin = document.getElementById('recycle-bin-btn');
+    if (recycleBin) recycleBin.style.display = pageId === 'tasks' ? '' : 'none';
   }
 
   /* ---------- PIN Screen ---------- */
@@ -157,7 +123,6 @@ const App = (() => {
           updateDots();
           if (pinValue.length === 4) {
             document.querySelector(`.pin-key[data-key="${e.key}"]`).click();
-            // PIN verification triggered above on 4th digit
           }
         } else if (e.key === 'Backspace') {
           pinValue = pinValue.slice(0, -1);
@@ -181,6 +146,14 @@ const App = (() => {
     document.getElementById('user-badge').textContent = currentUser;
     initRealtime();
     initEventListeners();
+
+    // Init other page modules
+    if (typeof Travel !== 'undefined') Travel.init(currentUser);
+    if (typeof Weight !== 'undefined') Weight.init();
+
+    // Restore saved page
+    const savedPage = localStorage.getItem('lt_active_page') || 'tasks';
+    switchPage(savedPage);
   }
 
   function initRealtime() {
@@ -210,7 +183,6 @@ const App = (() => {
     const topTasks = tasks
       .filter(t => !t.completed && !t.deleted && isTopPriority(t))
       .sort((a, b) => {
-        // Due date first (soonest), then creation date (newest)
         const aDue = a.due_date ? (a.due_date.toDate ? a.due_date.toDate() : new Date(a.due_date)) : null;
         const bDue = b.due_date ? (b.due_date.toDate ? b.due_date.toDate() : new Date(b.due_date)) : null;
         if (aDue && !bDue) return -1;
@@ -248,7 +220,7 @@ const App = (() => {
         delayOnTouchOnly: true,
         touchStartThreshold: 5,
         group: { name: 'tasks', pull: false, put: false },
-        onEnd: () => {} // Top priority reorder is session-only per spec
+        onEnd: () => {}
       });
     }
   }
@@ -257,7 +229,6 @@ const App = (() => {
     const container = document.getElementById('groups-container');
     const oldCollapseState = {};
 
-    // Preserve collapse state
     container.querySelectorAll('.group').forEach(el => {
       const gid = el.dataset.groupId;
       const taskList = el.querySelector('.task-list');
@@ -315,7 +286,6 @@ const App = (() => {
 
       container.appendChild(groupEl);
 
-      // Init sortable for this group's task list
       if (sortableInstances[group.id]) sortableInstances[group.id].destroy();
       sortableInstances[group.id] = new Sortable(taskListEl, {
         animation: 150,
@@ -329,7 +299,6 @@ const App = (() => {
       });
     });
 
-    // Init sortable for groups container
     if (sortableInstances['groups']) sortableInstances['groups'].destroy();
     sortableInstances['groups'] = new Sortable(container, {
       animation: 150,
@@ -375,7 +344,6 @@ const App = (() => {
           ${group ? `<span class="task-group-indicator" style="background: ${group.color}" title="${escapeHtml(group.name)}"></span>` : ''}
         `;
 
-        // Click checkbox to uncomplete
         el.querySelector('.task-checkbox').addEventListener('click', (e) => {
           e.stopPropagation();
           Store.uncompleteTask(task.id);
@@ -414,19 +382,16 @@ const App = (() => {
       </button>
     `;
 
-    // Checkbox click
     el.querySelector('.task-checkbox').addEventListener('click', (e) => {
       e.stopPropagation();
       Store.completeTask(task.id);
     });
 
-    // Star click
     el.querySelector('.task-star').addEventListener('click', (e) => {
       e.stopPropagation();
       Store.updateTask(task.id, { is_starred: !task.is_starred });
     });
 
-    // Click to open detail
     el.addEventListener('click', (e) => {
       if (e.target.closest('.task-checkbox') || e.target.closest('.task-star')) return;
       openTaskModal(task.id);
@@ -463,7 +428,6 @@ const App = (() => {
     createdByEl.textContent = `Created by ${task.created_by || 'Unknown'}`;
     createdAtEl.textContent = task.created_at ? formatFullDate(task.created_at) : '';
 
-    // Populate "Move to" group selector
     const moveGroupEl = document.getElementById('modal-move-group');
     moveGroupEl.innerHTML = groups
       .map(g => `<option value="${g.id}" ${g.id === task.group_id ? 'selected' : ''}>${escapeHtml(g.name)}</option>`)
@@ -548,7 +512,7 @@ const App = (() => {
             await Store.updateTask(task.id, { group_id: groups[0].id });
           }
           await Store.restoreTask(task.id);
-          openRecycleBin(); // Refresh
+          openRecycleBin();
         });
         container.appendChild(el);
       });
@@ -594,7 +558,6 @@ const App = (() => {
 
     if (!newGroupId) return;
 
-    // Build new order for destination list
     const taskEls = evt.to.querySelectorAll('.task-item');
     const updates = [];
     taskEls.forEach((el, idx) => {
@@ -604,7 +567,6 @@ const App = (() => {
       updates.push(update);
     });
 
-    // Also reorder source list if different from destination
     if (evt.from !== evt.to) {
       const srcEls = evt.from.querySelectorAll('.task-item');
       srcEls.forEach((el, idx) => {
@@ -631,6 +593,7 @@ const App = (() => {
       document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
       localStorage.setItem('lt_theme', isDark ? 'light' : 'dark');
       render();
+      if (typeof Weight !== 'undefined' && Weight.refreshTheme) Weight.refreshTheme();
     });
 
     // Logout
@@ -687,8 +650,8 @@ const App = (() => {
       await Store.createGroup(name.trim(), colour.header, groups.length);
     });
 
-    // Collapse toggles (delegated)
-    document.addEventListener('click', (e) => {
+    // Collapse toggles (delegated) — only handle Tasks page collapses
+    document.getElementById('page-tasks').addEventListener('click', (e) => {
       const collapseBtn = e.target.closest('.collapse-btn');
       if (!collapseBtn) return;
 
@@ -720,7 +683,7 @@ const App = (() => {
     });
 
     // Group actions (delegated)
-    document.addEventListener('click', (e) => {
+    document.getElementById('page-tasks').addEventListener('click', (e) => {
       const actionBtn = e.target.closest('.group-action-btn');
       if (!actionBtn) return;
       e.stopPropagation();
@@ -739,7 +702,7 @@ const App = (() => {
     });
 
     // Group name editing (delegated)
-    document.addEventListener('dblclick', (e) => {
+    document.getElementById('page-tasks').addEventListener('dblclick', (e) => {
       const nameEl = e.target.closest('.group-name');
       if (!nameEl || !nameEl.dataset.groupId) return;
 
@@ -758,7 +721,6 @@ const App = (() => {
         if (newName && newName !== currentName) {
           Store.updateGroup(groupId, { name: newName });
         }
-        // Re-render will replace this
         const span = document.createElement('span');
         span.className = 'group-name';
         span.dataset.groupId = groupId;
@@ -773,8 +735,8 @@ const App = (() => {
       });
     });
 
-    // Task add input (delegated)
-    document.addEventListener('keydown', (e) => {
+    // Task add input (delegated) — only Tasks page
+    document.getElementById('page-tasks').addEventListener('keydown', (e) => {
       if (e.key !== 'Enter') return;
       const input = e.target.closest('.task-add-input');
       if (!input) return;
@@ -788,6 +750,13 @@ const App = (() => {
 
       Store.createTask(title, groupId, orderIndex, currentUser);
       input.value = '';
+    });
+
+    // Tab bar switching
+    document.getElementById('tab-bar').addEventListener('click', (e) => {
+      const btn = e.target.closest('.tab-btn');
+      if (!btn) return;
+      switchPage(btn.dataset.page);
     });
   }
 
@@ -805,22 +774,12 @@ const App = (() => {
     });
   }
 
-  /* ---------- Utilities ---------- */
-
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
   /* ---------- Bootstrap ---------- */
 
   function init() {
-    // Restore dark mode preference
     const theme = localStorage.getItem('lt_theme') || 'light';
     document.documentElement.setAttribute('data-theme', theme);
 
-    // Check for existing session
     const savedUser = localStorage.getItem('lt_user');
     if (savedUser) {
       currentUser = savedUser;
@@ -830,7 +789,7 @@ const App = (() => {
     initPinScreen();
   }
 
-  return { init };
+  return { init, switchPage, getUser: () => currentUser };
 })();
 
 document.addEventListener('DOMContentLoaded', App.init);

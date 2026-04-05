@@ -13,6 +13,12 @@
   --slate-header: #A0B8C8;     --slate-tint: #F0F4F8;
   --blush-header: #E8A0C4;     --blush-tint: #FDF0F5;
 
+  /* Page-specific backgrounds */
+  --travel-bg: #F7F0F2;
+  --travel-surface: #FFFFFF;
+  --weight-bg: #F0F2F7;
+  --weight-surface: #FFFFFF;
+
   /* Light theme */
   --bg: #F5F5F7;
   --surface: #FFFFFF;
@@ -59,6 +65,12 @@
   --pin-dot-filled: #F5F5F7;
   --checkbox-border: #48484A;
   --star-inactive: #48484A;
+
+  /* Page-specific backgrounds (dark) */
+  --travel-bg: #1E1215;
+  --travel-surface: #2C2428;
+  --weight-bg: #121518;
+  --weight-surface: #1E2028;
 
   /* Muted pastel headers for dark mode */
   --rose-header: #8B5E5E;      --rose-tint: #3A2A2A;
@@ -284,6 +296,7 @@ body {
 .app-main {
   flex: 1;
   padding: 1rem;
+  padding-bottom: 70px;
   max-width: 700px;
   width: 100%;
   margin: 0 auto;
@@ -449,7 +462,8 @@ body {
   min-height: 2px;
 }
 
-.task-list.collapsed {
+.task-list.collapsed,
+.weight-section-body.collapsed {
   display: none;
 }
 
@@ -938,6 +952,339 @@ body {
 }
 
 /* ============================================
+   Pages & Tab Bar
+   ============================================ */
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+.page-travel {
+  background: var(--travel-bg);
+  border-radius: 12px;
+  padding: 0.5rem;
+  margin: -0.5rem;
+}
+
+.page-weight {
+  background: var(--weight-bg);
+  border-radius: 12px;
+  padding: 0.5rem;
+  margin: -0.5rem;
+}
+
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 0.35rem 0 env(safe-area-inset-bottom, 0.35rem);
+  z-index: 100;
+}
+
+.tab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.6rem;
+  font-family: inherit;
+  font-weight: 500;
+  padding: 0.35rem 1rem;
+  cursor: pointer;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s;
+}
+
+.tab-btn.active {
+  color: var(--text);
+}
+
+.tab-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* ============================================
+   Direction Selector (Travel page)
+   ============================================ */
+
+.direction-selector {
+  display: flex;
+  gap: 0;
+  background: var(--border);
+  border-radius: 10px;
+  padding: 3px;
+  margin-bottom: 0.75rem;
+}
+
+.direction-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.direction-btn.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+/* ============================================
+   Uncheck All Button (Travel groups)
+   ============================================ */
+
+.uncheck-all-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.uncheck-all-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="dark"] .uncheck-all-btn {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .uncheck-all-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================
+   Weight Page
+   ============================================ */
+
+.weight-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.weight-stat-card {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  text-align: center;
+}
+
+.weight-stat-value {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.weight-stat-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.weight-milestones {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.milestone-card {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+}
+
+.milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.milestone-target {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.milestone-remaining {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.milestone-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.milestone-progress {
+  height: 100%;
+  background: #34C759;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.milestone-projected {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-top: 0.3rem;
+}
+
+.weight-log-form {
+  padding: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.weight-log-field {
+  flex: 1;
+}
+
+.weight-log-field label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.weight-log-field input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  font: inherit;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+}
+
+.weight-log-field input:focus {
+  border-color: var(--text-secondary);
+}
+
+.weight-log-save {
+  border: none;
+  border-radius: 8px;
+  padding: 0.45rem 1rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: #34C759;
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.weight-log-save:hover {
+  background: #2DB84E;
+}
+
+.weight-chart-body {
+  padding: 0.75rem;
+}
+
+.weight-chart-body canvas {
+  max-height: 280px;
+}
+
+.weight-history {
+  padding: 0 0.75rem 0.75rem;
+}
+
+.weight-history-row {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  gap: 0.75rem;
+  min-height: 44px;
+}
+
+.weight-history-row:last-child {
+  border-bottom: none;
+}
+
+.weight-history-row:hover {
+  filter: brightness(0.97);
+}
+
+[data-theme="dark"] .weight-history-row:hover {
+  filter: brightness(1.1);
+}
+
+.weight-date {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  min-width: 65px;
+}
+
+.weight-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.weight-diff {
+  font-size: 0.8rem;
+  font-weight: 500;
+  min-width: 55px;
+  text-align: right;
+}
+
+.weight-diff.negative {
+  color: #34C759;
+}
+
+.weight-diff.positive {
+  color: var(--danger);
+}
+
+.weight-diff.neutral {
+  color: var(--text-secondary);
+}
+
+/* Weight section group headers */
+.weight-section .group-header {
+  cursor: default;
+}
+
+/* ============================================
    Group drag handle for sortable
    ============================================ */
 
@@ -956,6 +1303,7 @@ body {
 @media (max-width: 500px) {
   .app-main {
     padding: 0.5rem;
+    padding-bottom: 70px;
   }
 
   .group-header {
