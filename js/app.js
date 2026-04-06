@@ -80,13 +80,20 @@ const App = (() => {
   function initAuthScreen() {
     const googleProvider = new firebase.auth.GoogleAuthProvider();
 
+    // Detect standalone/PWA mode where popups don't work
+    const isStandalone = window.navigator.standalone ||
+      window.matchMedia('(display-mode: standalone)').matches;
+
     // Google sign-in button
     document.getElementById('google-signin-btn').addEventListener('click', async () => {
       const errorEl = document.getElementById('auth-error');
       errorEl.textContent = '';
       try {
-        await firebase.auth().signInWithPopup(googleProvider);
-        // onAuthStateChanged will handle the rest
+        if (isStandalone) {
+          await firebase.auth().signInWithRedirect(googleProvider);
+        } else {
+          await firebase.auth().signInWithPopup(googleProvider);
+        }
       } catch (err) {
         if (err.code !== 'auth/popup-closed-by-user') {
           errorEl.textContent = 'Sign-in failed. Please try again.';
@@ -103,7 +110,7 @@ const App = (() => {
       });
     });
 
-    // Firebase auth state listener
+    // Clear stale localStorage if no Firebase session
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         // Signed in — check if user already picked RC/LC
@@ -117,7 +124,9 @@ const App = (() => {
           document.getElementById('auth-user-pick').classList.remove('hidden');
         }
       } else {
-        // Signed out — show sign-in screen
+        // Signed out — clear any stale session data and show sign-in
+        localStorage.removeItem('lt_user');
+        currentUser = null;
         document.getElementById('auth-screen').classList.remove('hidden');
         document.getElementById('app').classList.add('hidden');
         document.getElementById('auth-signin').classList.remove('hidden');
