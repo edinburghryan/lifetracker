@@ -406,8 +406,6 @@ const Store = (() => {
     seedWeightEntries,
     createWeightEntry,
     updateWeightEntry,
-    deleteWeightEntry,
-    // Setup
-    setupPins
+    deleteWeightEntry
   };
 })();
