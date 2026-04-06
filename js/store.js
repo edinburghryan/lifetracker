@@ -11,14 +11,14 @@ const Store = (() => {
 
   /* ---------- Groups (Tasks page) ---------- */
 
-  function onGroupsChanged(callback) {
+  function onGroupsChanged(callback, onError) {
     return groupsRef.orderBy('order_index').onSnapshot(snapshot => {
       const groups = [];
       snapshot.forEach(doc => {
         groups.push({ id: doc.id, ...doc.data() });
       });
       callback(groups);
-    });
+    }, onError);
   }
 
   async function createGroup(name, color, orderIndex) {
@@ -56,14 +56,14 @@ const Store = (() => {
 
   /* ---------- Tasks ---------- */
 
-  function onTasksChanged(callback) {
+  function onTasksChanged(callback, onError) {
     return tasksRef.onSnapshot(snapshot => {
       const tasks = [];
       snapshot.forEach(doc => {
         tasks.push({ id: doc.id, ...doc.data() });
       });
       callback(tasks);
-    });
+    }, onError);
   }
 
   async function createTask(title, groupId, orderIndex, createdBy) {

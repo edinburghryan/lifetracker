@@ -77,20 +77,27 @@ const App = (() => {
 
   /* ---------- Auth Screen ---------- */
 
+  let appStarted = false;
+
   function initAuthScreen() {
     const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-    // Detect standalone/PWA mode where popups don't work
-    const isStandalone = window.navigator.standalone ||
-      window.matchMedia('(display-mode: standalone)').matches;
+    // Handle redirect result (mobile flow returns here after Google sign-in)
+    firebase.auth().getRedirectResult().catch(err => {
+      if (err.code && err.code !== 'auth/popup-closed-by-user') {
+        document.getElementById('auth-error').textContent = 'Sign-in failed. Please try again.';
+      }
+    });
 
-    // Google sign-in button
+    // Google sign-in button — use redirect on mobile, popup on desktop
     document.getElementById('google-signin-btn').addEventListener('click', async () => {
       const errorEl = document.getElementById('auth-error');
       errorEl.textContent = '';
       try {
-        if (isStandalone) {
-          await firebase.auth().signInWithRedirect(googleProvider);
+        // Redirect is more reliable across all browsers/PWAs
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        if (isMobile) {
+          firebase.auth().signInWithRedirect(googleProvider);
         } else {
           await firebase.auth().signInWithPopup(googleProvider);
         }
@@ -110,7 +117,7 @@ const App = (() => {
       });
     });
 
-    // Clear stale localStorage if no Firebase session
+    // Auth state listener
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         // Signed in — check if user already picked RC/LC
@@ -120,6 +127,7 @@ const App = (() => {
           showApp();
         } else {
           // Show user picker
+          document.getElementById('auth-screen').classList.remove('hidden');
           document.getElementById('auth-signin').classList.add('hidden');
           document.getElementById('auth-user-pick').classList.remove('hidden');
         }
@@ -127,6 +135,7 @@ const App = (() => {
         // Signed out — clear any stale session data and show sign-in
         localStorage.removeItem('lt_user');
         currentUser = null;
+        appStarted = false;
         document.getElementById('auth-screen').classList.remove('hidden');
         document.getElementById('app').classList.add('hidden');
         document.getElementById('auth-signin').classList.remove('hidden');
@@ -138,6 +147,9 @@ const App = (() => {
   /* ---------- App Init ---------- */
 
   function showApp() {
+    if (appStarted) return;
+    appStarted = true;
+
     document.getElementById('auth-screen').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     document.getElementById('user-badge').textContent = currentUser;
@@ -157,12 +169,12 @@ const App = (() => {
     Store.onGroupsChanged(newGroups => {
       groups = newGroups;
       render();
-    });
+    }, err => console.error('Groups listener error:', err));
 
     Store.onTasksChanged(newTasks => {
       tasks = newTasks;
       render();
-    });
+    }, err => console.error('Tasks listener error:', err));
   }
 
   /* ---------- Rendering ---------- */
