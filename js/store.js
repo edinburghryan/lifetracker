@@ -5,30 +5,9 @@
 const Store = (() => {
   const groupsRef = db.collection('groups');
   const tasksRef  = db.collection('tasks');
-  const configRef = db.collection('config');
   const travelGroupsRef = db.collection('travel_groups');
   const travelTasksRef  = db.collection('travel_tasks');
   const weightEntriesRef = db.collection('weight_entries');
-
-  /* ---------- PIN Auth ---------- */
-
-  async function verifyPin(pin) {
-    const hash = await hashPin(pin);
-    const doc = await configRef.doc('app').get();
-    if (!doc.exists) return null;
-    const data = doc.data();
-    if (data.pins.rc_hash === hash) return 'RC';
-    if (data.pins.lc_hash === hash) return 'LC';
-    return null;
-  }
-
-  async function hashPin(pin) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(pin + '_lifetracker_salt');
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
 
   /* ---------- Groups (Tasks page) ---------- */
 
@@ -392,21 +371,9 @@ const Store = (() => {
     return weightEntriesRef.doc(id).delete();
   }
 
-  /* ---------- Setup helper ---------- */
-
-  async function setupPins(rcPin, lcPin) {
-    const rcHash = await hashPin(rcPin);
-    const lcHash = await hashPin(lcPin);
-    return configRef.doc('app').set({
-      pins: { rc_hash: rcHash, lc_hash: lcHash }
-    });
-  }
-
   /* ---------- Public API ---------- */
 
   return {
-    verifyPin,
-    hashPin,
     onGroupsChanged,
     createGroup,
     updateGroup,

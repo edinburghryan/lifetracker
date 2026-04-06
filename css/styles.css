@@ -201,23 +201,65 @@ body {
   font-size: 1.3rem;
 }
 
-.pin-error {
+.pin-error, .auth-error {
   color: var(--danger);
   font-size: 0.85rem;
   min-height: 1.5em;
   margin-top: 1rem;
 }
 
-.pin-shake {
-  animation: shake 0.4s ease-in-out;
+.google-signin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-8px); }
-  40% { transform: translateX(8px); }
-  60% { transform: translateX(-6px); }
-  80% { transform: translateX(6px); }
+.google-signin-btn:hover {
+  background: var(--pin-key-hover);
+}
+
+.google-signin-btn:active {
+  transform: scale(0.97);
+}
+
+.user-pick-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.user-pick-btn {
+  padding: 14px 32px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 1.1rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.user-pick-btn:hover {
+  background: var(--pin-key-hover);
+}
+
+.user-pick-btn:active {
+  transform: scale(0.95);
 }
 
 /* ============================================

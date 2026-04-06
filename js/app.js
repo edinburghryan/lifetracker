@@ -75,73 +75,61 @@ const App = (() => {
     if (recycleBin) recycleBin.style.display = pageId === 'tasks' ? '' : 'none';
   }
 
-  /* ---------- PIN Screen ---------- */
+  /* ---------- Auth Screen ---------- */
 
-  function initPinScreen() {
-    const keys = document.querySelectorAll('.pin-key[data-key]');
-    const dots = document.querySelectorAll('.pin-dot');
-    const errorEl = document.getElementById('pin-error');
-    let pinValue = '';
+  function initAuthScreen() {
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-    keys.forEach(key => {
-      key.addEventListener('click', async () => {
-        const val = key.dataset.key;
-        if (val === 'delete') {
-          pinValue = pinValue.slice(0, -1);
-          updateDots();
-          return;
-        }
-        if (pinValue.length >= 4) return;
-        pinValue += val;
-        updateDots();
-
-        if (pinValue.length === 4) {
-          const user = await Store.verifyPin(pinValue);
-          if (user) {
-            currentUser = user;
-            localStorage.setItem('lt_user', user);
-            showApp();
-          } else {
-            errorEl.textContent = 'Incorrect PIN';
-            document.getElementById('pin-dots').classList.add('pin-shake');
-            setTimeout(() => {
-              document.getElementById('pin-dots').classList.remove('pin-shake');
-              pinValue = '';
-              updateDots();
-              errorEl.textContent = '';
-            }, 600);
-          }
-        }
-      });
-    });
-
-    // Keyboard support for PIN entry
-    document.addEventListener('keydown', (e) => {
-      if (!document.getElementById('pin-screen').classList.contains('hidden')) {
-        if (e.key >= '0' && e.key <= '9' && pinValue.length < 4) {
-          pinValue += e.key;
-          updateDots();
-          if (pinValue.length === 4) {
-            document.querySelector(`.pin-key[data-key="${e.key}"]`).click();
-          }
-        } else if (e.key === 'Backspace') {
-          pinValue = pinValue.slice(0, -1);
-          updateDots();
+    // Google sign-in button
+    document.getElementById('google-signin-btn').addEventListener('click', async () => {
+      const errorEl = document.getElementById('auth-error');
+      errorEl.textContent = '';
+      try {
+        await firebase.auth().signInWithPopup(googleProvider);
+        // onAuthStateChanged will handle the rest
+      } catch (err) {
+        if (err.code !== 'auth/popup-closed-by-user') {
+          errorEl.textContent = 'Sign-in failed. Please try again.';
         }
       }
     });
 
-    function updateDots() {
-      dots.forEach((dot, i) => {
-        dot.classList.toggle('filled', i < pinValue.length);
+    // User picker buttons (RC / LC)
+    document.querySelectorAll('.user-pick-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentUser = btn.dataset.user;
+        localStorage.setItem('lt_user', currentUser);
+        showApp();
       });
-    }
+    });
+
+    // Firebase auth state listener
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        // Signed in — check if user already picked RC/LC
+        const savedUser = localStorage.getItem('lt_user');
+        if (savedUser) {
+          currentUser = savedUser;
+          showApp();
+        } else {
+          // Show user picker
+          document.getElementById('auth-signin').classList.add('hidden');
+          document.getElementById('auth-user-pick').classList.remove('hidden');
+        }
+      } else {
+        // Signed out — show sign-in screen
+        document.getElementById('auth-screen').classList.remove('hidden');
+        document.getElementById('app').classList.add('hidden');
+        document.getElementById('auth-signin').classList.remove('hidden');
+        document.getElementById('auth-user-pick').classList.add('hidden');
+      }
+    });
   }
 
   /* ---------- App Init ---------- */
 
   function showApp() {
-    document.getElementById('pin-screen').classList.add('hidden');
+    document.getElementById('auth-screen').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     document.getElementById('user-badge').textContent = currentUser;
     initRealtime();
@@ -601,8 +589,8 @@ const App = (() => {
     document.getElementById('logout-btn').addEventListener('click', () => {
       localStorage.removeItem('lt_user');
       currentUser = null;
-      document.getElementById('app').classList.add('hidden');
-      document.getElementById('pin-screen').classList.remove('hidden');
+      firebase.auth().signOut();
+      // onAuthStateChanged will show the auth screen
     });
 
     // Recycle bin
@@ -781,13 +769,7 @@ const App = (() => {
     const theme = localStorage.getItem('lt_theme') || 'light';
     document.documentElement.setAttribute('data-theme', theme);
 
-    const savedUser = localStorage.getItem('lt_user');
-    if (savedUser) {
-      currentUser = savedUser;
-      showApp();
-    }
-
-    initPinScreen();
+    initAuthScreen();
   }
 
   return { init, switchPage, getUser: () => currentUser };
