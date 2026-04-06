@@ -89,20 +89,17 @@ const App = (() => {
       }
     });
 
-    // Google sign-in button — use redirect on mobile, popup on desktop
+    // Google sign-in button — try popup first, fall back to redirect
     document.getElementById('google-signin-btn').addEventListener('click', async () => {
       const errorEl = document.getElementById('auth-error');
       errorEl.textContent = '';
       try {
-        // Redirect is more reliable across all browsers/PWAs
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        if (isMobile) {
-          firebase.auth().signInWithRedirect(googleProvider);
-        } else {
-          await firebase.auth().signInWithPopup(googleProvider);
-        }
+        await firebase.auth().signInWithPopup(googleProvider);
       } catch (err) {
-        if (err.code !== 'auth/popup-closed-by-user') {
+        if (err.code === 'auth/popup-blocked') {
+          // Popup blocked (e.g. PWA mode) — fall back to redirect
+          firebase.auth().signInWithRedirect(googleProvider);
+        } else if (err.code !== 'auth/popup-closed-by-user') {
           errorEl.textContent = 'Sign-in failed. Please try again.';
         }
       }
