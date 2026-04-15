@@ -1,0 +1,25 @@
+{
+  "name": "LifeTracker",
+  "short_name": "LifeTracker",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#F8F8FA",
+  "theme_color": "#F8F8FA",
+  "icons": [
+    {
+      "src": "img/icon-v2-152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-v2-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-v2-750.png",
+      "sizes": "750x750",
+      "type": "image/png"
+    }
+  ]
+}

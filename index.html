@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://cdn.jsdelivr.net https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://fcmregistrations.googleapis.com; img-src 'self' data:; frame-src https://apis.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; worker-src 'self'">
+  <title>LifeTracker</title>
+  <meta name="apple-mobile-web-app-title" content="LifeTracker">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" sizes="180x180" href="img/icon-v2-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="img/icon-v2-152.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="css/styles.css?v=20260415k">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Auth Screen -->
+  <div id="auth-screen" class="pin-screen">
+    <div class="pin-container">
+      <h1 class="pin-title">LifeTracker</h1>
+      <!-- Step 1: Google Sign-In -->
+      <div id="auth-signin">
+        <p class="pin-subtitle">Sign in to continue</p>
+        <button class="google-signin-btn" id="google-signin-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Sign in with Google
+        </button>
+        <p class="auth-error" id="auth-error"></p>
+      </div>
+      <!-- Step 2: Who's this? -->
+      <div id="auth-user-pick" class="hidden">
+        <p class="pin-subtitle">Who's this?</p>
+        <div class="user-pick-buttons">
+          <button class="user-pick-btn" data-user="RC">RC</button>
+          <button class="user-pick-btn" data-user="LC">LC</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" class="app hidden">
+
+    <!-- Notification Permission Banner -->
+    <div id="notif-banner" class="notif-banner hidden">
+      <span>Enable notifications for due dates and updates</span>
+      <div class="notif-banner-actions">
+        <button class="notif-banner-btn notif-enable" id="notif-enable-btn">Enable</button>
+        <button class="notif-banner-btn notif-dismiss" id="notif-dismiss-btn">Not now</button>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="app-title">LifeTracker</h1>
+        <span class="user-badge" id="user-badge"></span>
+      </div>
+      <div class="header-right">
+        <button class="icon-btn" id="recycle-bin-btn" title="Recycle Bin">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+        <button class="icon-btn" id="dark-mode-btn" title="Toggle dark mode">
+          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="icon-btn" id="logout-btn" title="Log out">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main" id="app-main">
+
+      <!-- ========== TASKS PAGE ========== -->
+      <div id="page-tasks" class="page page-tasks active">
+
+        <!-- Top Priority System Group -->
+        <section class="group top-priority-group" id="top-priority-group">
+          <div class="group-header top-priority-header">
+            <button class="collapse-btn" data-group="top-priority">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <span class="group-name">Top Priority</span>
+            <span class="group-count" id="top-priority-count">0</span>
+          </div>
+          <div class="task-list" id="top-priority-tasks"></div>
+        </section>
+
+        <!-- User Groups Container (sortable) -->
+        <div id="groups-container"></div>
+
+        <!-- Add Group Button -->
+        <div class="add-group-section">
+          <button class="add-group-btn" id="add-group-btn">+ Add Group</button>
+        </div>
+
+        <!-- Completed Section -->
+        <section class="group completed-group" id="completed-group">
+          <div class="group-header completed-header">
+            <button class="collapse-btn" data-group="completed">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <span class="group-name">Completed</span>
+            <span class="group-count" id="completed-count">0</span>
+            <button class="clear-completed-btn" id="clear-completed-btn" title="Delete all completed tasks">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            </button>
+          </div>
+          <div class="task-list" id="completed-tasks"></div>
+        </section>
+
+      </div>
+
+      <!-- ========== TRAVEL PAGE ========== -->
+      <div id="page-travel" class="page page-travel">
+        <!-- Direction Selector (populated from Firestore config) -->
+        <div class="direction-selector" id="direction-selector"></div>
+
+        <!-- Travel Groups (rendered by JS) -->
+        <div id="travel-groups-container"></div>
+      </div>
+
+      <!-- ========== WEIGHT PAGE ========== -->
+      <div id="page-weight" class="page page-weight">
+        <!-- Rendered by weight.js -->
+      </div>
+
+    </main>
+
+    <!-- Tab Bar -->
+    <nav class="tab-bar" id="tab-bar">
+      <button class="tab-btn active" data-page="tasks">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Tasks</span>
+      </button>
+      <button class="tab-btn" data-page="travel">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Travel</span>
+      </button>
+      <button class="tab-btn" data-page="weight">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12l3 7H3z"/><path d="M3 9a9 9 0 0 0 18 0"/><line x1="12" y1="2" x2="12" y2="5"/></svg>
+        <span>Weight</span>
+      </button>
+    </nav>
+
+    <!-- Task Detail Modal -->
+    <div class="modal-overlay hidden" id="task-modal-overlay">
+      <div class="modal" id="task-modal">
+        <div class="modal-header">
+          <h2 class="modal-title" id="modal-title" contenteditable="true"></h2>
+          <button class="icon-btn modal-close" id="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-field">
+            <label>Description</label>
+            <textarea id="modal-description" placeholder="Add notes..." maxlength="5000"></textarea>
+          </div>
+          <div class="modal-field">
+            <label>Due Date</label>
+            <div class="modal-date-row">
+              <input type="date" id="modal-due-date">
+              <button class="clear-date-btn" id="modal-clear-date" title="Clear date">&times;</button>
+            </div>
+          </div>
+          <div class="modal-field">
+            <label>Move to</label>
+            <select id="modal-move-group"></select>
+          </div>
+          <div class="modal-meta">
+            <span id="modal-created-by"></span>
+            <span id="modal-created-at"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="icon-btn modal-delete-btn" id="modal-delete" title="Delete task">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+          <button class="btn btn-ok" id="modal-ok">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recycle Bin Modal -->
+    <div class="modal-overlay hidden" id="recycle-modal-overlay">
+      <div class="modal" id="recycle-modal">
+        <div class="modal-header">
+          <h2 class="modal-title">Recycle Bin</h2>
+          <button class="icon-btn modal-close" id="recycle-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="task-list" id="recycle-bin-tasks">
+            <p class="empty-message">No deleted tasks</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Group Colour Picker Modal -->
+    <div class="modal-overlay hidden" id="colour-modal-overlay">
+      <div class="modal modal-sm" id="colour-modal">
+        <div class="modal-header">
+          <h2 class="modal-title">Choose Colour</h2>
+          <button class="icon-btn modal-close" id="colour-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="colour-grid" id="colour-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Travel Task Detail Modal -->
+    <div class="modal-overlay hidden" id="travel-modal-overlay">
+      <div class="modal" id="travel-modal">
+        <div class="modal-header">
+          <h2 class="modal-title" id="travel-modal-title" contenteditable="true"></h2>
+          <button class="icon-btn modal-close" id="travel-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-field">
+            <label>Description</label>
+            <textarea id="travel-modal-description" placeholder="Add notes..." maxlength="5000"></textarea>
+          </div>
+          <div class="modal-field">
+            <label>Applies to</label>
+            <select id="travel-modal-applies-to">
+              <option value="both">Both</option>
+              <!-- Location options populated from Firestore config -->
+            </select>
+          </div>
+          <div class="modal-field">
+            <label>Move to</label>
+            <select id="travel-modal-move-group"></select>
+          </div>
+          <div class="modal-meta">
+            <span id="travel-modal-created-by"></span>
+            <span id="travel-modal-created-at"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="icon-btn modal-delete-btn" id="travel-modal-delete" title="Delete task">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+          <button class="btn btn-ok" id="travel-modal-ok">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weight Edit Modal -->
+    <div class="modal-overlay hidden" id="weight-edit-modal-overlay">
+      <div class="modal modal-sm" id="weight-edit-modal">
+        <div class="modal-header">
+          <h2 class="modal-title">Edit Entry</h2>
+          <button class="icon-btn modal-close" id="weight-edit-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-field">
+            <label>Weight (kg)</label>
+            <input type="number" id="weight-edit-input" step="0.1" min="50" max="300" inputmode="decimal">
+          </div>
+          <div class="modal-field">
+            <label>Date</label>
+            <input type="date" id="weight-edit-date">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="icon-btn modal-delete-btn" id="weight-edit-delete" title="Delete entry">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+          <button class="btn btn-ok" id="weight-edit-ok">OK</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Firebase SDK (compat for simplicity with no build step) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" integrity="sha384-AQ3POAMqIhwS81FrUH95ekxqBZHeP5tG2JfEL3+7GuTtfRLWnrRh32UxwzM+//A9" crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js" integrity="sha384-TnlRYaR4JYz/lpaGuaiU61PjNberSA4vjLjtF+oRC/IkohkJqnWxw5EmDSOt1vA1" crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" integrity="sha384-qn4Jh88HhJA8dplNQyGjOh9OGI4izVhrfj/qIFgaKcdgOE06pXqIKGlsCILZcLAC" crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js" integrity="sha384-XtSlZdmg0Ad5zf0AX4W9TGdm+dGjaNK4KG3lNFjfgbnxkCEuT9ugWXkLExgQTJ+6" crossorigin="anonymous"></script>
+
+  <!-- SortableJS -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" integrity="sha384-HZZ/fukV+9G8gwTNjN7zQDG0Sp7MsZy5DDN6VfY3Be7V9dvQpEpR2jF2HlyFUUjU" crossorigin="anonymous"></script>
+
+  <!-- Chart.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" integrity="sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC" crossorigin="anonymous"></script>
+
+  <!-- App Scripts -->
+  <script src="js/firebase-config.js?v=20260415k"></script>
+  <script src="js/store.js?v=20260415k"></script>
+  <script src="js/utils.js?v=20260415k"></script>
+  <script src="js/app.js?v=20260415k"></script>
+  <script src="js/travel.js?v=20260415k"></script>
+  <script src="js/weight.js?v=20260415k"></script>
+  <script src="js/notifications.js?v=20260415k"></script>
+
+</body>
+</html>
