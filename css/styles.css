@@ -1432,3 +1432,121 @@ body {
 [data-theme="dark"] .notif-dismiss {
   color: #F5F5F7;
 }
+
+/* ============================================
+   Recurring Page
+   ============================================ */
+
+/* Due Tasks header (same visual weight as Top Priority) */
+.recurring-due-header {
+  background: var(--top-priority-header);
+  color: #F5F5F7;
+  cursor: default;
+}
+
+.recurring-due-header .collapse-btn {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.recurring-due-header .group-count {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .recurring-due-header {
+  color: #1C1C1E;
+}
+
+[data-theme="dark"] .recurring-due-header .collapse-btn {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .recurring-due-header .group-count {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* Cycle (Done) button for due tasks */
+.recurring-cycle-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--checkbox-border, var(--border));
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+  color: var(--text-secondary);
+}
+
+.recurring-cycle-btn:hover {
+  border-color: #34C759;
+  color: #34C759;
+}
+
+.recurring-cycle-btn:active {
+  background: #34C759;
+  border-color: #34C759;
+  color: #fff;
+}
+
+.recurring-cycle-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Frequency badge */
+.recurring-frequency-badge {
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--border);
+  padding: 1px 6px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* Read-only modal value */
+.modal-readonly-value {
+  font-size: 0.88rem;
+  color: var(--text);
+  display: block;
+  padding: 0.4rem 0;
+}
+
+/* In-page recycle bin button */
+.recurring-recycle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.recurring-recycle-btn:hover {
+  border-color: var(--text-secondary);
+  color: var(--text);
+}
+
+/* Add task button label (non-input variant) */
+.task-add-label {
+  flex: 1;
+  font: inherit;
+  font-size: 16px;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  padding: 6px 0;
+}

@@ -126,6 +126,37 @@ exports.checkDueDates = onSchedule(
       });
     });
 
+    // Also check recurring tasks
+    const recurringSnapshot = await db.collection("recurring_tasks")
+      .where("deleted", "==", false)
+      .get();
+
+    recurringSnapshot.forEach(doc => {
+      const task = doc.data();
+      if (!task.next_due) return;
+
+      const dueDate = task.next_due.toDate();
+      const dueMidnight = new Date(dueDate.toISOString().split("T")[0] + "T00:00:00");
+      const diffDays = Math.round((dueMidnight - today) / dayMs);
+
+      // Notify at 5 days before, 1 day before, and on due date
+      if (diffDays !== 0 && diffDays !== 1 && diffDays !== 5) return;
+
+      const todayISO = today.toISOString().split("T")[0];
+      const dedupKey = `recurring_${doc.id}_${diffDays}_${todayISO}`;
+
+      let label;
+      if (diffDays === 0) label = "is due today";
+      else if (diffDays === 1) label = "is due tomorrow";
+      else label = "is due in 5 days";
+
+      notifications.push({
+        title: task.title,
+        label,
+        dedupKey
+      });
+    });
+
     // Send notifications using atomic create to prevent race condition duplicates
     for (const notif of notifications) {
       const logRef = db.collection("notification_log").doc(notif.dedupKey);

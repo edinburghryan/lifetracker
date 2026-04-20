@@ -9,6 +9,8 @@ const Store = (() => {
   const travelGroupsRef = db.collection('travel_groups');
   const travelTasksRef  = db.collection('travel_tasks');
   const weightEntriesRef = db.collection('weight_entries');
+  const recurringGroupsRef = db.collection('recurring_groups');
+  const recurringTasksRef  = db.collection('recurring_tasks');
 
   /* ---------- App Config ---------- */
 
@@ -253,6 +255,128 @@ const Store = (() => {
     return weightEntriesRef.doc(id).delete();
   }
 
+  /* ---------- Recurring Groups ---------- */
+
+  function onRecurringGroupsChanged(callback, onError) {
+    return recurringGroupsRef.orderBy('order_index').onSnapshot(snapshot => {
+      const groups = [];
+      snapshot.forEach(doc => {
+        groups.push({ id: doc.id, ...doc.data() });
+      });
+      callback(groups);
+    }, onError);
+  }
+
+  async function createRecurringGroup(name, color, orderIndex) {
+    return recurringGroupsRef.add({
+      name,
+      color,
+      order_index: orderIndex,
+      is_collapsed: false,
+      created_at: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  async function updateRecurringGroup(id, data) {
+    return recurringGroupsRef.doc(id).update(data);
+  }
+
+  async function deleteRecurringGroup(id) {
+    const tasks = await recurringTasksRef.where('group_id', '==', id).get();
+    const batch = db.batch();
+    const now = firebase.firestore.Timestamp.now();
+    tasks.forEach(doc => {
+      batch.update(doc.ref, { deleted: true, deleted_at: now });
+    });
+    batch.delete(recurringGroupsRef.doc(id));
+    return batch.commit();
+  }
+
+  async function reorderRecurringGroups(orderedIds) {
+    const batch = db.batch();
+    orderedIds.forEach((id, index) => {
+      batch.update(recurringGroupsRef.doc(id), { order_index: index });
+    });
+    return batch.commit();
+  }
+
+  /* ---------- Recurring Tasks ---------- */
+
+  function onRecurringTasksChanged(callback, onError) {
+    return recurringTasksRef.onSnapshot(snapshot => {
+      const tasks = [];
+      snapshot.forEach(doc => {
+        tasks.push({ id: doc.id, ...doc.data() });
+      });
+      callback(tasks);
+    }, onError);
+  }
+
+  async function createRecurringTask(title, groupId, orderIndex, createdBy, frequency, startDate) {
+    const ts = startDate || firebase.firestore.Timestamp.now();
+    return recurringTasksRef.add({
+      title,
+      description: '',
+      group_id: groupId,
+      order_index: orderIndex,
+      created_by: createdBy,
+      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+      frequency: frequency || 'monthly',
+      start_date: ts,
+      next_due: ts,
+      last_completed: null,
+      deleted: false,
+      deleted_at: null
+    });
+  }
+
+  async function updateRecurringTask(id, data) {
+    return recurringTasksRef.doc(id).update(data);
+  }
+
+  async function cycleRecurringTask(id, frequency) {
+    const now = new Date();
+    let nextDue;
+    if (frequency === 'weekly') nextDue = new Date(now.getTime() + 7 * 86400000);
+    else if (frequency === 'fortnightly') nextDue = new Date(now.getTime() + 14 * 86400000);
+    else {
+      nextDue = new Date(now);
+      nextDue.setMonth(nextDue.getMonth() + 1);
+    }
+    return recurringTasksRef.doc(id).update({
+      last_completed: firebase.firestore.Timestamp.now(),
+      next_due: firebase.firestore.Timestamp.fromDate(nextDue)
+    });
+  }
+
+  async function softDeleteRecurringTask(id) {
+    return recurringTasksRef.doc(id).update({
+      deleted: true,
+      deleted_at: firebase.firestore.Timestamp.now()
+    });
+  }
+
+  async function restoreRecurringTask(id) {
+    return recurringTasksRef.doc(id).update({
+      deleted: false,
+      deleted_at: null
+    });
+  }
+
+  async function permanentlyDeleteRecurringTask(id) {
+    return recurringTasksRef.doc(id).delete();
+  }
+
+  async function reorderRecurringTasks(taskIdOrderPairs) {
+    const batch = db.batch();
+    taskIdOrderPairs.forEach(({ id, order_index, group_id }) => {
+      const update = { order_index };
+      if (group_id !== undefined) update.group_id = group_id;
+      batch.update(recurringTasksRef.doc(id), update);
+    });
+    return batch.commit();
+  }
+
   /* ---------- User Preferences ---------- */
 
   async function getPrefs(userId) {
@@ -298,6 +422,20 @@ const Store = (() => {
     createWeightEntry,
     updateWeightEntry,
     deleteWeightEntry,
+    // Recurring
+    onRecurringGroupsChanged,
+    createRecurringGroup,
+    updateRecurringGroup,
+    deleteRecurringGroup,
+    reorderRecurringGroups,
+    onRecurringTasksChanged,
+    createRecurringTask,
+    updateRecurringTask,
+    cycleRecurringTask,
+    softDeleteRecurringTask,
+    restoreRecurringTask,
+    permanentlyDeleteRecurringTask,
+    reorderRecurringTasks,
     // Preferences
     getPrefs,
     savePrefs

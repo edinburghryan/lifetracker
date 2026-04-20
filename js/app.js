@@ -166,6 +166,7 @@ const App = (() => {
     // Init other page modules, passing prefs
     if (typeof Travel !== 'undefined') Travel.init(currentUser, prefs);
     if (typeof Weight !== 'undefined') Weight.init(prefs);
+    if (typeof Recurring !== 'undefined') Recurring.init(currentUser, prefs);
 
     // Init notifications
     if (typeof Notifications !== 'undefined') {
@@ -630,6 +631,7 @@ const App = (() => {
       render();
       if (typeof Travel !== 'undefined' && Travel.refreshTheme) Travel.refreshTheme();
       if (typeof Weight !== 'undefined' && Weight.refreshTheme) Weight.refreshTheme();
+      if (typeof Recurring !== 'undefined' && Recurring.refreshTheme) Recurring.refreshTheme();
     });
 
     // Notification banner
@@ -649,6 +651,7 @@ const App = (() => {
       teardownRealtime();
       if (typeof Travel !== 'undefined' && Travel.teardown) Travel.teardown();
       if (typeof Weight !== 'undefined' && Weight.teardown) Weight.teardown();
+      if (typeof Recurring !== 'undefined' && Recurring.teardown) Recurring.teardown();
       if (typeof Notifications !== 'undefined' && Notifications.teardown) Notifications.teardown();
       Object.keys(localStorage)
         .filter(k => k.startsWith('lt_') && k !== 'lt_theme')

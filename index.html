@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" sizes="152x152" href="img/icon-v2-152.png">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="css/styles.css?v=20260415k">
+  <link rel="stylesheet" href="css/styles.css?v=20260420a">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -131,6 +131,37 @@
         <!-- Rendered by weight.js -->
       </div>
 
+      <!-- ========== RECURRING PAGE ========== -->
+      <div id="page-recurring" class="page page-recurring">
+
+        <!-- Due Tasks Section -->
+        <section class="group recurring-due-group" id="recurring-due-group">
+          <div class="group-header recurring-due-header">
+            <button class="collapse-btn" data-group="recurring-due">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <span class="group-name">Due Tasks</span>
+            <span class="group-count" id="recurring-due-count">0</span>
+          </div>
+          <div class="task-list" id="recurring-due-tasks"></div>
+        </section>
+
+        <!-- Recurring Groups Container (sortable) -->
+        <div id="recurring-groups-container"></div>
+
+        <!-- Add Group + Recycle Bin -->
+        <div class="add-group-section">
+          <button class="add-group-btn" id="recurring-add-group-btn">+ Add Group</button>
+        </div>
+        <div class="add-group-section">
+          <button class="recurring-recycle-btn" id="recurring-recycle-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Recycle Bin
+          </button>
+        </div>
+
+      </div>
+
     </main>
 
     <!-- Tab Bar -->
@@ -146,6 +177,10 @@
       <button class="tab-btn" data-page="weight">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12l3 7H3z"/><path d="M3 9a9 9 0 0 0 18 0"/><line x1="12" y1="2" x2="12" y2="5"/></svg>
         <span>Weight</span>
+      </button>
+      <button class="tab-btn" data-page="recurring">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2c3.3 0 6.22 1.6 8.05 4.05"/><polyline points="22 2 22 8 16 8"/><path d="M9 12l2 2 4-4"/></svg>
+        <span>Recurring</span>
       </button>
     </nav>
 
@@ -277,6 +312,86 @@
       </div>
     </div>
 
+    <!-- Recurring Task Edit Modal -->
+    <div class="modal-overlay hidden" id="recurring-modal-overlay">
+      <div class="modal" id="recurring-modal">
+        <div class="modal-header">
+          <h2 class="modal-title" id="recurring-modal-title" contenteditable="true"></h2>
+          <button class="icon-btn modal-close" id="recurring-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-field">
+            <label>Description</label>
+            <textarea id="recurring-modal-description" placeholder="Add notes..." maxlength="5000"></textarea>
+          </div>
+          <div class="modal-field">
+            <label>Start Date</label>
+            <div class="modal-date-row">
+              <input type="date" id="recurring-modal-start-date">
+            </div>
+          </div>
+          <div class="modal-field">
+            <label>Frequency</label>
+            <select id="recurring-modal-frequency">
+              <option value="weekly">Weekly</option>
+              <option value="fortnightly">Fortnightly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <label>Next Due</label>
+            <span class="modal-readonly-value" id="recurring-modal-next-due"></span>
+          </div>
+          <div class="modal-field">
+            <label>Last Completed</label>
+            <span class="modal-readonly-value" id="recurring-modal-last-completed"></span>
+          </div>
+          <div class="modal-field">
+            <label>Move to</label>
+            <select id="recurring-modal-move-group"></select>
+          </div>
+          <div class="modal-meta">
+            <span id="recurring-modal-created-by"></span>
+            <span id="recurring-modal-created-at"></span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="icon-btn modal-delete-btn" id="recurring-modal-delete" title="Delete task">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+          <button class="btn btn-ok" id="recurring-modal-ok">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recurring Colour Picker Modal -->
+    <div class="modal-overlay hidden" id="recurring-colour-modal-overlay">
+      <div class="modal modal-sm" id="recurring-colour-modal">
+        <div class="modal-header">
+          <h2 class="modal-title">Choose Colour</h2>
+          <button class="icon-btn modal-close" id="recurring-colour-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="colour-grid" id="recurring-colour-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recurring Recycle Bin Modal -->
+    <div class="modal-overlay hidden" id="recurring-recycle-modal-overlay">
+      <div class="modal" id="recurring-recycle-modal">
+        <div class="modal-header">
+          <h2 class="modal-title">Recurring Recycle Bin</h2>
+          <button class="icon-btn modal-close" id="recurring-recycle-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="task-list" id="recurring-recycle-bin-tasks">
+            <p class="empty-message">No deleted tasks</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Firebase SDK (compat for simplicity with no build step) -->
@@ -293,11 +408,12 @@
 
   <!-- App Scripts -->
   <script src="js/firebase-config.js?v=20260415k"></script>
-  <script src="js/store.js?v=20260415k"></script>
-  <script src="js/utils.js?v=20260415k"></script>
-  <script src="js/app.js?v=20260415k"></script>
+  <script src="js/store.js?v=20260420a"></script>
+  <script src="js/utils.js?v=20260420a"></script>
+  <script src="js/app.js?v=20260420a"></script>
   <script src="js/travel.js?v=20260415k"></script>
   <script src="js/weight.js?v=20260420a"></script>
+  <script src="js/recurring.js?v=20260420a"></script>
   <script src="js/notifications.js?v=20260415k"></script>
 
 </body>

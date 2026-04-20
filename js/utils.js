@@ -70,6 +70,21 @@ const Utils = (() => {
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   }
 
+  function computeNextDue(fromDate, frequency) {
+    const d = new Date(fromDate);
+    if (frequency === 'weekly') d.setDate(d.getDate() + 7);
+    else if (frequency === 'fortnightly') d.setDate(d.getDate() + 14);
+    else d.setMonth(d.getMonth() + 1);
+    return d;
+  }
+
+  function formatFrequency(freq) {
+    if (freq === 'weekly') return 'Weekly';
+    if (freq === 'fortnightly') return 'Fortnightly';
+    if (freq === 'monthly') return 'Monthly';
+    return freq || '';
+  }
+
   return {
     PALETTE,
     DARK_PALETTE,
@@ -77,6 +92,8 @@ const Utils = (() => {
     getColourForGroup,
     escapeHtml,
     formatFullDate,
-    formatDate
+    formatDate,
+    computeNextDue,
+    formatFrequency
   };
 })();
