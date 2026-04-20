@@ -74,6 +74,12 @@ const Weight = (() => {
     return s.weight - c.weight;
   }
 
+  function totalLostPct() {
+    const s = getStarting();
+    if (!s || s.weight <= 0) return 0;
+    return (totalLost() / s.weight) * 100;
+  }
+
   function avgWeeklyLoss() {
     if (entries.length < 2) return 0;
     const first = entryDate(entries[0]);
@@ -196,7 +202,7 @@ const Weight = (() => {
     const starting = getStarting();
     const current = getCurrent();
     const lost = totalLost();
-    const avgLoss = avgWeeklyLoss();
+    const lostPct = totalLostPct();
     const best = bestWeek();
     const ma4 = movingAvgLoss(4);
 
@@ -211,16 +217,16 @@ const Weight = (() => {
           <div class="weight-stat-label">4-wk Avg Loss</div>
         </div>
         <div class="weight-stat-card">
-          <div class="weight-stat-value">${starting ? bmi(starting.weight) : '—'}</div>
-          <div class="weight-stat-label">Starting BMI</div>
-        </div>
-        <div class="weight-stat-card">
-          <div class="weight-stat-value">${avgLoss.toFixed(1)} kg</div>
-          <div class="weight-stat-label">Avg / Week</div>
-        </div>
-        <div class="weight-stat-card">
           <div class="weight-stat-value">${best.toFixed(1)} kg</div>
           <div class="weight-stat-label">4-wk Best</div>
+        </div>
+        <div class="weight-stat-card weight-stat-highlight">
+          <div class="weight-stat-value">${lostPct.toFixed(1)}%</div>
+          <div class="weight-stat-label">Total Lost</div>
+        </div>
+        <div class="weight-stat-card">
+          <div class="weight-stat-value">${starting ? bmi(starting.weight) : '—'}</div>
+          <div class="weight-stat-label">Starting BMI</div>
         </div>
         <div class="weight-stat-card">
           <div class="weight-stat-value">${current ? bmi(current.weight) : '—'}</div>
