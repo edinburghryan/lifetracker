@@ -126,8 +126,14 @@ Cloud Functions in `functions/index.js`, deployed to us-central1:
 FCM tokens are stored per user in `config/prefs_RC.fcm_token` and `config/prefs_LC.fcm_token`.
 Per-user UI preferences, including section ordering, live in the same `prefs_*` documents.
 
-Firestore security rules are managed in the console and are **not** currently version
-controlled here.
+Auth is a **single shared Google account**, so the RC and LC split is application-level
+only, in `App.getUser()` and the `prefs_RC` / `prefs_LC` documents. It is a UI convention,
+not a security boundary.
+
+Firestore security rules are managed in the console and are deliberately **not** version
+controlled here. They reference a personal identifier, so committing the file would publish
+it. Reviewed and decided in September 2026: do not propose moving them into the repo, and
+do not commit a copy of them.
 
 ## Git history
 
@@ -141,6 +147,13 @@ done, and the safeguards that replaced it are the Firestore split described abov
 The cost of that workflow was that no history survived, so each new session had to
 rediscover project context by interrogation. That is what this file exists to prevent. If
 you find instructions elsewhere telling you to squash and force push, they are superseded.
+
+**Commit identity must be overridden explicitly.** Author and committer are both
+`edinburghryan <7222310+edinburghryan@users.noreply.github.com>`. Only `user.email` is set
+locally, and the machine's global `user.name` is a real name, so a plain `git commit`
+publishes it. The old squash workflow hid this behind an `--author` flag on every amend;
+that safety net is gone. Set the identity per commit, for example via `git commit-tree` with
+`GIT_AUTHOR_*` and `GIT_COMMITTER_*`, and do not change the user's git config to fix it.
 
 ## Known stale documentation
 
